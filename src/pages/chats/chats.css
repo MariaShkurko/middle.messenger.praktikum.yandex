@@ -1,0 +1,42 @@
+.chats {
+  width: 100vw;
+  display: flex;
+
+  &__sidebar {
+    width: 25%;
+    min-width: 310px;
+    height: 100vh;
+    background-color: var(--background-list-color);
+  }
+
+  &__header {
+    padding: 21px 10px 14px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  &__button-link {
+    color: var(--text-secondary-color);
+    font-size: 12px;
+    line-height: 12px;
+    margin-bottom: 23px;
+    align-self: flex-end;
+
+    &:hover {
+      color: var(--primary-color);
+    }
+  }
+
+  &__list {
+    height: calc(100vh - 105px);
+    border-top: 1px solid var(--border-color);
+    overflow: auto;
+  }
+
+  &__main {
+    flex: 1;
+    height: 100vh;
+    min-width: 320px;
+    border-left: 1px solid var(--border-color);
+  }
+}
