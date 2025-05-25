@@ -1,0 +1,13 @@
+.avatar {
+  width: var(--avatar-width, auto);
+  height: var(--avatar-height, auto);
+  border-radius: 50%;
+  overflow: hidden;
+  background-color: var(--background-fill-color);
+
+  & img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
