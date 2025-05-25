@@ -1,13 +1,11 @@
-import autoprefixer from 'autoprefixer';
-import postcssNesting from 'postcss-nesting';
-import postcssPresetEnv from 'postcss-preset-env';
-import stylelint from 'stylelint';
+import autoprefixer from "autoprefixer";
+import postcssNested from "postcss-nested";
+import postcssPresetEnv from "postcss-preset-env";
 
 export default {
-    plugins: [
-        stylelint(),
-        autoprefixer(),
-        postcssNesting(),
-        postcssPresetEnv(),
-    ],
+  plugins: [
+    autoprefixer(),
+    postcssNested(),
+    postcssPresetEnv(),
+  ],
 };
