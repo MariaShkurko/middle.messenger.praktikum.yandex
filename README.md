@@ -26,20 +26,20 @@ Figma: https://www.figma.com/design/nyCcHdBKIdxAuihydRQjl2/middle.messenger.prak
 
 | Страница               | Путь               |
 |------------------------|--------------------|
-| Авторизация            | `/login`           |
-| Регистрация            | `/registration`    |
-| Список чатов + чат     | `/chats`           |
-| Профиль пользователя   | `/user-profile`    |
-| Редактирование профиля | `/edit-user-profile` |
-| Смена пароля           | `/edit-password`   |
-| Ошибка 404             | `/404.html`        |
-| Ошибка 500             | `/500.html`        |
+| Авторизация            | `https://vite-messenger.netlify.app/login`           |
+| Регистрация            | `https://vite-messenger.netlify.app/registration`    |
+| Список чатов + чат     | `https://vite-messenger.netlify.app/chats`           |
+| Профиль пользователя   | `https://vite-messenger.netlify.app/user-profile`    |
+| Редактирование профиля | `https://vite-messenger.netlify.app/edit-user-profile` |
+| Смена пароля           | `https://vite-messenger.netlify.app/edit-password`   |
+| Ошибка 404             | `https://vite-messenger.netlify.app/404.html`        |
+| Ошибка 500             | `https://vite-messenger.netlify.app/500.html`        |
 
 ---
 
 ## Установка
 
-📦 Веб-адрес приложения: `<добавить после публикации>`
+📦 Веб-адрес приложения: `https://vite-messenger.netlify.app`
 
 > Убедитесь, что у вас установлен Node.js >= 16
 
