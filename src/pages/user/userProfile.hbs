@@ -1,0 +1,54 @@
+<div class="user-profile">
+  <div class="user-profile__back-button">
+    {{> Button icon=arrowIcon variant="icon" page="chats"}}
+  </div>
+  <div class="user-profile__main">
+    <form id="user-profile-form">
+      <div class="user-profile__short-info">
+        {{> Avatar avatar=user.avatar width="130px" height="130px"}}
+        <p>{{user.display_name}}</p>
+      </div>
+      <div class="user-profile__detailed-info">
+        <div class="user-profile__line">
+          <span>Почта</span>
+          {{> Input id="email" type="text" formId="user-profile-form" value=user.email variant="line" disabled=disableEdit}}
+        </div>
+        <div class="user-profile__line">
+          <span>Логин</span>
+          {{> Input id="login" type="text" formId="user-profile-form" value=user.login variant="line" disabled=disableEdit}}
+        </div>
+        <div class="user-profile__line">
+          <span>Имя</span>
+          {{> Input id="first_name" type="text" formId="user-profile-form" value=user.first_name variant="line" disabled=disableEdit}}
+        </div>
+        <div class="user-profile__line">
+          <span>Фамилия</span>
+          {{> Input id="second_name" type="text" formId="user-profile-form" value=user.second_name variant="line" disabled=disableEdit}}
+        </div>
+        <div class="user-profile__line">
+          <span>Имя в чате</span>
+          {{> Input id="display_name" type="text" formId="user-profile-form" value=user.display_name variant="line" disabled=disableEdit}}
+        </div>
+        <div class="user-profile__line">
+          <span>Телефон</span>
+          {{> Input id="phone" type="text" formId="user-profile-form" value=user.phone variant="line" disabled=disableEdit}}
+        </div>
+      </div>
+      <div class="user-profile__controls{{#unless disableEdit}} user-profile__controls--edit{{/unless}}">
+        {{#if disableEdit}}
+          <div class="user-profile__line">
+            {{> Button label="Изменить данные" variant="link" page="edit-user-profile"}}
+          </div>
+          <div class="user-profile__line">
+            {{> Button label="Изменить пароль" variant="link" page="edit-password"}}
+          </div>
+          <div class="user-profile__line button--exit">
+            {{> Button label="Выйти" variant="link" page="login"}}
+          </div>
+        {{else}}
+          {{> Button label="Сохранить" variant="primary" page="user-profile"}}
+        {{/if}}
+      </div>
+    </form>
+  </div>
+</div>
