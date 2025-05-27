@@ -41,6 +41,35 @@
     }
   }
 
+  &__avatar-button {
+    position: relative;
+    background-color: transparent;
+    border: none;
+    border-radius: 50%;
+    overflow: hidden;
+
+    & > .overlay {
+      position: absolute;
+      inset: 0;
+      display: none;
+      justify-content: center;
+      align-items: center;
+      padding: 20%;
+      background-color: rgba(0, 0, 0, 0.5);
+
+      & > span {
+        font-size: 13px;
+        line-height: 14px;
+        white-space: wrap;
+        color: var(--white-color);
+      }
+    }
+
+    &:hover > .overlay {
+      display: flex;
+    }
+  }
+
   &__line {
     display: flex;
     justify-content: space-between;

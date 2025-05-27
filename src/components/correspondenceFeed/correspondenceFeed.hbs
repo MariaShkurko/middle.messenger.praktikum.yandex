@@ -1,5 +1,5 @@
 <div class="feed">
-  <div class="feed__header">
+  <header class="feed__header">
     <div class="feed__contact">
       {{> Avatar avatar=contact.avatar width="34px" height="34px"}}
       <span>{{contact.name}}</span>
@@ -9,7 +9,7 @@
       <div class="point"></div>
       <div class="point"></div>
     </div>
-  </div>
+  </header>
 
   <div class="feed__main">
     {{#each messages}}
@@ -24,7 +24,7 @@
   <div class="feed__new-message">
     <form id="new-message">
       {{> Input id="message" formId="new-message" label="Сообщение" type="text" variant="outlined" class="feed__input" }}
-      {{> Button icon=arrowIcon variant="icon"}}
+      {{> Button icon=arrowIcon variant="icon" type="submit"}}
     </form>
   </div>
 </div>
