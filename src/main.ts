@@ -55,11 +55,13 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 document.addEventListener("click", e => {
-  const target = (e.target as HTMLElement).closest("[data-page]");
+  const eventTarget = e.target;
+  // обеспечиваем всплытие события до родительского компонента с атрибутом data-page
+  // если такой родитель не найден, функция прерывается
+  const target = eventTarget instanceof Element ? eventTarget.closest("[data-page]") : null;
   if (!target) return;
 
-  //@ts-ignore
-  const page = e.target.getAttribute("data-page");
+  const page = target.getAttribute("data-page");
   if (page) {
     navigate(page);
 
