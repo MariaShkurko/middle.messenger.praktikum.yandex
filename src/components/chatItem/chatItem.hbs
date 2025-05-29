@@ -1,0 +1,13 @@
+<div class="chat-item {{#if selected}}chat-item--selected{{/if}}">
+  {{> Avatar avatar=avatar width="47px" height="47px" class="chat-item__avatar"}}
+  <div class="chat-item__info">
+    <span class="chat-item__name">{{name}}</span>
+    <span class="chat-item__last">{{lastMessage}}</span>
+  </div>
+  <div class="chat-item__meta-info">
+    <span class="chat-item__time">{{lastMessageTime}}</span>
+    {{#if unreadCount}}
+      <div class="chat-item__badge">{{unreadCount}}</div>
+    {{/if}}
+  </div>
+</div>

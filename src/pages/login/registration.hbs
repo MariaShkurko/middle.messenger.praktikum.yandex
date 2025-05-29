@@ -1,0 +1,18 @@
+<div class="login">
+  <form id="registration" class="login__form-card registration__form-card">
+    <div>
+      <h1 class="login__title">Регистрация</h1>
+      {{> Input id="email" label="Почта" type="email" formId="registration" variant="standard" class="login__input"}}
+      {{> Input id="login" label="Логин" type="text" formId="registration" variant="standard" class="login__input"}}
+      {{> Input id="first_name" label="Имя" type="text" formId="registration" variant="standard" class="login__input"}}
+      {{> Input id="second_name" label="Фамилия" type="text" formId="registration" variant="standard" class="login__input"}}
+      {{> Input id="phone" label="Телефон" type="tel" formId="registration" variant="standard" class="login__input"}}
+      {{> Input id="password" label="Пароль" type="password" formId="registration" variant="standard" class="login__input"}}
+      {{> Input id="again-password" label="Пароль (ещё раз)" type="password" formId="registration" variant="standard"}}
+    </div>
+    <div class="login__button-wrapper">
+      {{> Button label="Зарегистрироваться" variant="primary" page="chats" type="submit"}}
+      {{> Button label="Войти" variant="link" page="login" type="button"}}
+    </div>
+  </form>
+</div>

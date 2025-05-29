@@ -1,0 +1,18 @@
+<div class="input-field input-field--{{default variant "standard"}} {{#if errorMessage}}input-field--error{{/if}} {{class}}">
+  {{#if leftIcon}}
+    <span class="input-field__left-icon">{{{leftIcon}}}</span>
+  {{/if}}
+  <input
+    id="{{id}}"
+    name="{{id}}"
+    type={{default type "text"}}
+    form="{{formId}}"
+    placeholder="{{label}}"
+    {{#if disabled}}disabled{{/if}}
+    {{#if value}}value="{{value}}"{{/if}}
+  >
+  <label for={{id}}>{{label}}</label>
+  {{#if errorMessage}}
+    <div class="input-field__error-label">{{errorMessage}}</div>
+  {{/if}}
+</div>

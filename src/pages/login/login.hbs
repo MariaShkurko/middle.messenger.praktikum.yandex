@@ -1,0 +1,13 @@
+<div class="login">
+  <form id="login-form" class="login__form-card">
+    <div>
+      <h1 class="login__title">Вход</h1>
+      {{> Input id="login" label="Логин" type="text" formId="login-form" variant="standard" class="login__input"}}
+      {{> Input id="password" label="Пароль" type="password" formId="login-form" variant="standard" }}
+    </div>
+    <div class="login__button-wrapper">
+      {{> Button label="Авторизоваться" variant="primary" page="chats" type="submit"}}
+      {{> Button label="Нет аккаунта?" variant="link" page="registration" type="button"}}
+    </div>
+  </form>
+</div>

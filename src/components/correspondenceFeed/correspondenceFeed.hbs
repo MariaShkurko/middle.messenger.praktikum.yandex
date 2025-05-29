@@ -1,0 +1,30 @@
+<div class="feed">
+  <header class="feed__header">
+    <div class="feed__contact">
+      {{> Avatar avatar=contact.avatar width="34px" height="34px"}}
+      <span>{{contact.name}}</span>
+    </div>
+    <div class="menu-button">
+      <div class="point"></div>
+      <div class="point"></div>
+      <div class="point"></div>
+    </div>
+  </header>
+
+  <div class="feed__main">
+    {{#each messages}}
+      <div class="message{{#if isOwn}} message--own{{/if}}{{#if image}} message--p0{{/if}}">
+        {{#if text}}<p>{{text}}</p>{{/if}}
+        {{#if image}}<img src="{{image}}" alt="media" class="message__image" />{{/if}}
+        <div class="message__time{{#if image}} message__time--darkened{{/if}}">{{time}}</div>
+      </div>
+    {{/each}}
+  </div>
+
+  <div class="feed__new-message">
+    <form id="new-message">
+      {{> Input id="message" formId="new-message" label="Сообщение" type="text" variant="outlined" class="feed__input" }}
+      {{> Button icon=arrowIcon variant="icon" type="submit"}}
+    </form>
+  </div>
+</div>
