@@ -11,18 +11,31 @@
     "build": "tsc && vite build",
     "preview": "vite preview",
     "start": "npm run build && npm run preview",
-    "lint:css": "stylelint \"**/*.css\" --config stylelint.config.cjs"
+    "lint:css": "stylelint \"**/*.css\" --config stylelint.config.cjs",
+    "lint": "eslint . --ext .ts --config .eslintrc.cjs",
+    "format": "prettier --write ."
   },
   "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^8.33.1",
+    "@typescript-eslint/parser": "^8.33.1",
     "autoprefixer": "^10.4.21",
+    "eslint": "^8.57.1",
+    "eslint-config-airbnb": "^19.0.4",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-config-prettier": "^10.1.5",
+    "eslint-import-resolver-typescript": "^4.4.2",
+    "eslint-plugin-import": "^2.31.0",
+    "eslint-plugin-prettier": "^5.4.1",
     "postcss": "^8.5.3",
     "postcss-nested": "^7.0.2",
     "postcss-preset-env": "^10.1.6",
+    "prettier": "^3.5.3",
     "stylelint": "^16.19.1",
     "typescript": "~5.8.3",
     "vite": "^6.3.5"
   },
   "dependencies": {
-    "handlebars": "^4.7.8"
+    "handlebars": "^4.7.8",
+    "uuid": "^11.1.0"
   }
 }
