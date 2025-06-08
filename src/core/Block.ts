@@ -218,6 +218,14 @@ class Block<TProps extends Props = Props> {
     return true;
   }
 
+  public addClassName(className: string) {
+    this._element?.classList.add(className);
+  }
+
+  public removeClassName(className: string) {
+    this._element?.classList.remove(className);
+  }
+
   public dispatchComponentDidMount(): void {
     this._eventBus.emit(Block.EVENTS.FLOW_CDM);
   }

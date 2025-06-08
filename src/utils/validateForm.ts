@@ -1,6 +1,6 @@
-import { INPUT_NAME, type T_INPUT_NAME } from "../constants/INPUT_NAME";
+import { INPUT_NAME, type TInputName } from "../constants/INPUT_NAME";
 
-export const validateInput = (inputName: T_INPUT_NAME, value: string): string | null => {
+export const validateInput = (inputName: TInputName, value: string): string | null => {
   switch (inputName) {
     case INPUT_NAME.FIRST_NAME:
     case INPUT_NAME.SECOND_NAME: {
@@ -27,7 +27,8 @@ export const validateInput = (inputName: T_INPUT_NAME, value: string): string | 
       return null;
     }
 
-    case INPUT_NAME.PASSWORD: {
+    case INPUT_NAME.PASSWORD:
+    case INPUT_NAME.AGAIN_PASSWORD: {
       const regex = /^(?=.*[A-Z])(?=.*\d)[A-Za-z\d]{8,40}$/;
       if (!regex.test(value)) {
         return "Пароль от 8 до 40 символов, хотя бы одна заглавная буква и цифра";

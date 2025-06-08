@@ -4,8 +4,9 @@ export const INPUT_NAME = {
   LOGIN: "login",
   EMAIL: "email",
   PASSWORD: "password",
+  AGAIN_PASSWORD: "again_password",
   PHONE: "phone",
   MESSAGE: "message",
 };
 
-export type T_INPUT_NAME = (typeof INPUT_NAME)[keyof typeof INPUT_NAME];
+export type TInputName = (typeof INPUT_NAME)[keyof typeof INPUT_NAME];
