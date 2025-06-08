@@ -8,45 +8,50 @@ import arrowIcon from "./assets/arrow-icon.svg?raw";
 import searchIcon from "./assets/search-icon.svg?raw";
 
 import { chatsMockData, userMockData } from "./mockData.js";
+import renderDOM from "./core/renderDOM.js";
 
 const pages = {
   login: [Pages.LoginPage],
   registration: [Pages.RegistrationPage],
   chats: [
     Pages.ChatsPage,
-    {
-      arrowIcon,
-      searchIcon,
-      showDialog: true,
-      data: chatsMockData,
-    },
+    // {
+    //   arrowIcon,
+    //   searchIcon,
+    //   showDialog: true,
+    //   data: chatsMockData,
+    // },
   ],
   "user-profile": [
     Pages.UserProfilePage,
-    {
-      arrowIcon,
-      user: userMockData,
-      disableEdit: true,
-    },
+    // {
+    //   arrowIcon,
+    //   user: userMockData,
+    //   disableEdit: true,
+    // },
   ],
   "edit-user-profile": [
     Pages.UserProfilePage,
-    {
-      arrowIcon,
-      user: userMockData,
-      disableEdit: false,
-    },
+    // {
+    //   arrowIcon,
+    //   user: userMockData,
+    //   disableEdit: false,
+    // },
   ],
   "edit-password": [
     Pages.EditPasswordPage,
-    {
-      arrowIcon,
-      user: userMockData,
-    },
+    // {
+    //   arrowIcon,
+    //   user: userMockData,
+    // },
   ],
 };
 
 Object.entries(Components).forEach(([name, template]) => {
+  if (typeof template === "function") {
+    return;
+  }
+
   Handlebars.registerPartial(name, template);
 });
 
@@ -56,6 +61,11 @@ const isPageKey = (key: unknown): key is keyof TPage => typeof key === "string" 
 
 function navigate(page: keyof TPage) {
   const [source, context] = pages[page];
+  if (typeof source === "function") {
+    renderDOM(new source());
+    return;
+  }
+
   const container = document.getElementById("app")!;
 
   const templatingFunction = Handlebars.compile(source);
