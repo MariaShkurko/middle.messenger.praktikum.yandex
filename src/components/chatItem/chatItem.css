@@ -38,5 +38,9 @@
     line-height: 12px;
     text-align: center;
     color: var(--white-color);
+
+    &--empty {
+      display: none;
+    }
   }
 }
