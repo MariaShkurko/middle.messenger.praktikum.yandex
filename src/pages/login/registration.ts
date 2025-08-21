@@ -1,5 +1,5 @@
 import { Button, Input } from "../../components";
-import { INPUT_NAME, type TInputName } from "../../constants/INPUT_NAME";
+import { INPUT_NAME } from "../../constants/INPUT_NAME";
 import Block, { type Props } from "../../core/Block";
 import { validateInput } from "../../utils/validateForm";
 
@@ -56,7 +56,6 @@ export default class RegistrationPage extends Block<TRegistrationPageProps> {
     };
 
     const onChange = (id: string, value: string) => {
-      console.log(id, value, validateInput(id, value));
       this.setProps({
         formState: {
           ...this.props.formState,
@@ -163,6 +162,7 @@ export default class RegistrationPage extends Block<TRegistrationPageProps> {
       type: "submit",
       onClick: (e) => {
         e.preventDefault();
+        // eslint-disable-next-line no-console
         console.log(this.props.formState);
       },
     });
@@ -173,6 +173,7 @@ export default class RegistrationPage extends Block<TRegistrationPageProps> {
       type: "button",
       onClick: (e) => {
         e.preventDefault();
+        // eslint-disable-next-line no-console
         console.log("navigate to login");
       },
     });
@@ -197,7 +198,6 @@ export default class RegistrationPage extends Block<TRegistrationPageProps> {
     _oldProps: TRegistrationPageProps,
     _newProps: TRegistrationPageProps,
   ): boolean {
-    console.log(_oldProps, _newProps);
     Object.keys(_newProps.formState).forEach((key) => {
       const keyProp = key as keyof TRegistrationPageProps["formState"];
       if (_newProps.formState[keyProp] !== _oldProps.formState[keyProp]) {

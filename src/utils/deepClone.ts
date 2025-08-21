@@ -1,6 +1,6 @@
 export default function deepClone<T>(value: T, hash = new WeakMap<object, any>()): T {
   // Примитивы и функции возвращаем как есть
-  if (Object(value) !== value || typeof value === 'function') {
+  if (Object(value) !== value || typeof value === "function") {
     return value;
   }
 
@@ -43,14 +43,14 @@ export default function deepClone<T>(value: T, hash = new WeakMap<object, any>()
   if (value instanceof Set) {
     const result = new Set();
     hash.set(value, result);
-    value.forEach(v => result.add(deepClone(v, hash)));
+    value.forEach((v) => result.add(deepClone(v, hash)));
     return result as T;
   }
 
   // Обычный объект
   const result: Record<string, unknown> = {};
   hash.set(value as object, result);
-  Object.keys(value as object).forEach(key => {
+  Object.keys(value as object).forEach((key) => {
     const val = (value as Record<string, unknown>)[key];
     result[key] = deepClone(val, hash);
   });

@@ -1,5 +1,4 @@
-import { initRouter, navigate } from "./core/navigate.js";
-import { isPageKey } from "./core/routes.js";
+import { initRouter } from "./core/router";
 import "./helpers/handlebarsHelpers.js";
 import "./style.css";
 

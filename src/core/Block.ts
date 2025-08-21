@@ -8,6 +8,7 @@ type EventHandler = (e: Event) => void;
 type Events = Record<string, EventHandler>;
 type Children = Record<string, Block | Block[]>;
 type StyleProps = Partial<CSSStyleDeclaration> & {
+  // eslint-disable-next-line no-unused-vars
   [key in `--${string}`]?: string;
 };
 
@@ -56,20 +57,31 @@ class Block<TProps extends Props = Props> {
   }
 
   #makePropsProxy(props: TProps): TProps {
-    // const emit = this.#eventBus.emit.bind(this.#eventBus);
-    return new Proxy(props, {
-      get(target, prop) {
+    const emit = this.#eventBus.emit.bind(this.#eventBus);
+
+    return new Proxy<TProps>(props, {
+      get: (target: TProps, prop: string | symbol): unknown => {
         if (typeof prop === "string" && prop in target) {
-          const value = target[prop];
-          return typeof value === "function" ? value.bind(target) : value;
+          const value = target[prop as keyof TProps];
+          if (typeof value === "function") {
+            return (value as (...args: unknown[]) => unknown).bind(target);
+          }
+          return value;
         }
+        return undefined;
       },
-      set(target, prop, value) {
-        console.log("🚀 ~ Block ~ set ~ target, prop, value:", target, prop, value);
+      // set(target, prop: keyof TProps, value) {
+      //   const oldTarget = deepClone(target);
+      //   target[prop] = value;
+      //   emit(Block.EVENTS.FLOW_CDU, oldTarget, target);
+      //   return true;
+      // },
+      set: (target: TProps, prop: string | symbol, value: unknown): boolean => {
         if (typeof prop === "string" && prop in target) {
-          // const oldTarget = deepClone(target);
-          target[prop as keyof TProps] = value;
-          // emit(Block.EVENTS.FLOW_CDU, oldTarget, target);
+          const oldTarget = deepClone(target);
+          const key = prop as keyof TProps;
+          target[key] = value as TProps[typeof key];
+          emit(Block.EVENTS.FLOW_CDU, oldTarget, target);
           return true;
         }
         throw new Error("Invalid prop key type");
@@ -113,9 +125,10 @@ class Block<TProps extends Props = Props> {
       for (const [key, value] of Object.entries(style)) {
         if (typeof value === "string") {
           if (key.startsWith("--")) {
-            this.#element!.style.setProperty(key, value);
-          } else if (key in this.#element!.style) {
-            (this.#element!.style as any)[key] = value;
+            this.#element.style.setProperty(key, value);
+          } else if (key in this.#element.style) {
+            const kebabKey = key.replace(/[A-Z]/g, (match) => `-${match.toLowerCase()}`);
+            this.#element.style.setProperty(kebabKey, value);
           }
         }
       }

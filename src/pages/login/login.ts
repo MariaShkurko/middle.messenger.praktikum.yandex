@@ -1,7 +1,7 @@
 import { Button, Input } from "../../components";
 import { INPUT_NAME } from "../../constants/INPUT_NAME";
 import Block, { type Props } from "../../core/Block";
-import { go } from "../../core/navigate";
+import { go } from "../../core/router";
 import { validateInput } from "../../utils/validateForm";
 
 type TLoginFormData = {
@@ -27,9 +27,9 @@ export default class LoginPage extends Block<TLoginPageProps> {
     const allValidateInput = (): boolean => {
       let isValid = true;
 
-      const newErrors: TLoginFormData = { ...errors };
-      for (const key in formState) {
-        const err = validateInput(key, formState[key as keyof TLoginFormData]);
+      const newErrors: TLoginFormData = { ...this.props.errors };
+      for (const key in this.props.formState) {
+        const err = validateInput(key, this.props.formState[key as keyof TLoginFormData]);
         newErrors[key as keyof TLoginFormData] = err;
         if (err !== "") {
           isValid = false;
@@ -57,11 +57,6 @@ export default class LoginPage extends Block<TLoginPageProps> {
           [id]: validateInput(id, value),
         },
       });
-    };
-    const onSignIn = () => {
-      if (allValidateInput()) {
-        console.log(this.props.formState);
-      }
     };
 
     const InputLogin = new Input({
@@ -103,6 +98,7 @@ export default class LoginPage extends Block<TLoginPageProps> {
       onClick: (e) => {
         e.preventDefault();
         if (allValidateInput()) {
+          // eslint-disable-next-line no-console
           console.log(this.props.formState);
           go("chats");
         }
@@ -115,6 +111,7 @@ export default class LoginPage extends Block<TLoginPageProps> {
       type: "button",
       onClick: (e) => {
         e.preventDefault();
+        // eslint-disable-next-line no-console
         console.log("navigate to registration");
       },
     });
@@ -131,29 +128,20 @@ export default class LoginPage extends Block<TLoginPageProps> {
   }
 
   protected componentDidUpdate(_oldProps: TLoginPageProps, _newProps: TLoginPageProps): boolean {
-    if (_oldProps.formState.login !== _newProps.formState.login) {
-      if (!Array.isArray(this.children.InputLogin)) {
-        return true;
-      }
+    if (!Array.isArray(this.children.InputLogin)) {
+      this.children.InputLogin.setProps({
+        value: _newProps.formState.login,
+        errorMessage: _newProps.errors.login,
+      });
     }
-    if (_oldProps.errors.login !== _newProps.errors.login) {
-      if (!Array.isArray(this.children.InputLogin)) {
-        return true;
-      }
-    }
-
-    if (_oldProps.formState.password !== _newProps.formState.password) {
-      if (!Array.isArray(this.children.InputPassword)) {
-        return true;
-      }
-    }
-    if (_oldProps.errors.password !== _newProps.errors.password) {
-      if (!Array.isArray(this.children.InputPassword)) {
-        return true;
-      }
+    if (!Array.isArray(this.children.InputPassword)) {
+      this.children.InputPassword.setProps({
+        value: _newProps.formState.password,
+        errorMessage: _newProps.errors.password,
+      });
     }
 
-    return false;
+    return true;
   }
 
   public render(): string {

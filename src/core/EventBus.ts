@@ -1,6 +1,6 @@
-type Listener<T extends any[] = any[]> = (...args: T) => void;
+type Listener<T extends unknown[] = unknown[]> = (...args: T) => void;
 
-class EventBus<Events extends Record<string, any[]>> {
+class EventBus<Events extends Record<string, unknown[]>> {
   private listeners: {
     [K in keyof Events]?: Listener<Events[K]>[];
   } = {};
@@ -17,7 +17,7 @@ class EventBus<Events extends Record<string, any[]>> {
     if (!eventListeners) {
       throw new Error(`Нет события: ${String(event)}`);
     }
-    this.listeners[event] = eventListeners.filter(l => l !== callback);
+    this.listeners[event] = eventListeners.filter((l) => l !== callback);
   }
 
   emit<K extends keyof Events>(event: K, ...args: Events[K]): void {
@@ -25,7 +25,7 @@ class EventBus<Events extends Record<string, any[]>> {
     if (!eventListeners) {
       throw new Error(`Нет события: ${String(event)}`);
     }
-    eventListeners.forEach(listener => listener(...args));
+    eventListeners.forEach((listener) => listener(...args));
   }
 }
 
