@@ -1,6 +1,6 @@
 import { INPUT_NAME, type TInputName } from "../constants/INPUT_NAME";
 
-export const validateInput = (inputName: TInputName, value: string): string | null => {
+export const validateInput = (inputName: TInputName, value: string): string => {
   switch (inputName) {
     case INPUT_NAME.FIRST_NAME:
     case INPUT_NAME.SECOND_NAME: {
@@ -8,7 +8,7 @@ export const validateInput = (inputName: TInputName, value: string): string | nu
       if (!regex.test(value)) {
         return "Разрешенный формат - первая буква заглавная, только буквы и дефис, без пробелов и цифр";
       }
-      return null;
+      return "";
     }
 
     case INPUT_NAME.LOGIN: {
@@ -16,7 +16,7 @@ export const validateInput = (inputName: TInputName, value: string): string | nu
       if (!regex.test(value)) {
         return "Логин должен быть от 3 до 20 символов, только латиница, может содержать цифры, '-', '_', но не состоять только из цифр";
       }
-      return null;
+      return "";
     }
 
     case INPUT_NAME.EMAIL: {
@@ -24,7 +24,7 @@ export const validateInput = (inputName: TInputName, value: string): string | nu
       if (!regex.test(value)) {
         return "Некорректный email";
       }
-      return null;
+      return "";
     }
 
     case INPUT_NAME.PASSWORD:
@@ -33,7 +33,7 @@ export const validateInput = (inputName: TInputName, value: string): string | nu
       if (!regex.test(value)) {
         return "Пароль от 8 до 40 символов, хотя бы одна заглавная буква и цифра";
       }
-      return null;
+      return "";
     }
 
     case INPUT_NAME.PHONE: {
@@ -41,17 +41,17 @@ export const validateInput = (inputName: TInputName, value: string): string | nu
       if (!regex.test(value)) {
         return "Телефон должен быть от 10 до 15 цифр, может начинаться с +";
       }
-      return null;
+      return "";
     }
 
     case INPUT_NAME.MESSAGE: {
       if (!value.trim()) {
         return "Сообщение не должно быть пустым";
       }
-      return null;
+      return "";
     }
 
     default:
-      return null;
+      return "";
   }
 };
