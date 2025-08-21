@@ -1,101 +1,178 @@
+import { v4 as makeUUID } from "uuid";
 import camera from "./assets/camera.jpg";
+import type { TChatListData, TMessage } from "./types";
 
-const selectedChat = {
-  id: 4,
-  name: "Вадим",
-  avatar: "",
-};
-
-const chats = [
+export const chats: TChatListData = [
   {
-    id: 1,
-    name: "Андрей",
-    avatar: "",
-    lastMessage: "Изображение",
-    lastMessageTime: "12:00",
+    id: makeUUID(),
+    contact: {
+      id: makeUUID(),
+      name: "Андрей",
+      avatarUrl: "",
+    },
+    lastMessage: {
+      imageUrl: "https://vheer-nextjs.vercel.app/images/randomSamples/animal/20250212105248.webp",
+      dateTime: new Date(2025, 4, 12, 12),
+      isOwn: false,
+    },
     unreadCount: 20,
   },
-  { id: 2, name: "Киноклуб", avatar: "", lastMessage: "Вы: стикер", lastMessageTime: "12:00" },
   {
-    id: 3,
-    name: "Илья",
-    avatar: "",
-    lastMessage: "Друзья, у меня для вас...",
-    lastMessageTime: "12:00",
+    id: makeUUID(),
+    contact: {
+      id: makeUUID(),
+      name: "Киноклуб",
+      avatarUrl: "",
+    },
+    lastMessage: {
+      text: "🤔",
+      dateTime: new Date(2025, 4, 12, 12),
+      isOwn: true,
+    },
+    unreadCount: 0,
+  },
+  {
+    id: makeUUID(),
+    contact: {
+      id: makeUUID(),
+      name: "Илья",
+      avatarUrl: "",
+    },
+    lastMessage: {
+      text: "Друзья, у меня для вас...",
+      dateTime: new Date(2025, 4, 12, 12),
+      isOwn: false,
+    },
     unreadCount: 4,
   },
-  { id: 4, name: "Вадим", avatar: "", lastMessage: "Вы: Круто!", lastMessageTime: "12:00" },
   {
-    id: 5,
-    name: "тет-а-теты",
-    avatar: "",
-    lastMessage: "И Human Interface Guidelines...",
-    lastMessageTime: "12:00",
+    id: makeUUID(),
+    contact: {
+      id: makeUUID(),
+      name: "Вадим",
+      avatarUrl: "",
+    },
+    lastMessage: {
+      text: "Круто!",
+      dateTime: new Date(2025, 4, 12, 12),
+      isOwn: true,
+    },
+    unreadCount: 0,
   },
   {
-    id: 6,
-    name: "1, 2, 3",
-    avatar: "",
-    lastMessage: "Миллионы россиян ежедневно...",
-    lastMessageTime: "12:00",
+    id: makeUUID(),
+    contact: {
+      id: makeUUID(),
+      name: "тет-а-теты",
+      avatarUrl: "",
+    },
+    lastMessage: {
+      text: "И Human Interface Guidelines...",
+      dateTime: new Date(2025, 4, 12, 12),
+      isOwn: false,
+    },
+    unreadCount: 0,
   },
   {
-    id: 7,
-    name: "Design Destroyer",
-    avatar: "",
-    lastMessage: "В 2008 году художник...",
-    lastMessageTime: "12:00",
+    id: makeUUID(),
+    contact: {
+      id: makeUUID(),
+      name: "1, 2, 3",
+      avatarUrl: "",
+    },
+    lastMessage: {
+      text: "Миллионы россиян ежедневно...",
+      dateTime: new Date(2025, 4, 12, 12),
+      isOwn: false,
+    },
+    unreadCount: 0,
   },
   {
-    id: 8,
-    name: "Day.",
-    avatar: "",
-    lastMessage: "Так увлёкся работой...",
-    lastMessageTime: "12:00",
+    id: makeUUID(),
+    contact: {
+      id: makeUUID(),
+      name: "Design Destroyer",
+      avatarUrl: "",
+    },
+    lastMessage: {
+      text: "В 2008 году художник...",
+      dateTime: new Date(2025, 4, 12, 12),
+      isOwn: false,
+    },
+    unreadCount: 0,
   },
   {
-    id: 9,
-    name: "Стас Рогозин",
-    avatar: "",
-    lastMessage: "Можно или сегодня...",
-    lastMessageTime: "12:00",
+    id: makeUUID(),
+    contact: {
+      id: makeUUID(),
+      name: "Day.",
+      avatarUrl: "",
+    },
+    lastMessage: {
+      text: "Так увлёкся работой...",
+      dateTime: new Date(2025, 4, 12, 12),
+      isOwn: false,
+    },
+    unreadCount: 0,
   },
-  { id: 10, name: "Project X", avatar: "", lastMessage: "Детали позже", lastMessageTime: "12:00" },
+  {
+    id: makeUUID(),
+    contact: {
+      id: makeUUID(),
+      name: "Стас Рогозин",
+      avatarUrl: "",
+    },
+    lastMessage: {
+      text: "Можно или сегодня...",
+      dateTime: new Date(2025, 4, 12, 12),
+      isOwn: false,
+    },
+    unreadCount: 0,
+  },
+  {
+    id: makeUUID(),
+    contact: {
+      id: makeUUID(),
+      name: "Project X",
+      avatarUrl: "",
+    },
+    lastMessage: {
+      text: "Детали позже",
+      dateTime: new Date(2025, 4, 12, 12),
+      isOwn: false,
+    },
+    unreadCount: 0,
+  },
 ];
 
-const messages = [
+export const messages: TMessage[] = [
   {
     text: "Привет! Смотри, тут всплыл интересный кусок лунной истории...",
-    time: "11:56",
+    dateTime: new Date(2025, 4, 12, 11, 56),
     isOwn: false,
   },
   {
-    image: camera,
-    time: "11:56",
+    imageUrl: camera,
+    dateTime: new Date(2025, 4, 12, 11, 56),
     isOwn: false,
   },
   {
     text: "Круто!",
-    time: "12:00",
+    dateTime: new Date(2025, 4, 12, 12),
     isOwn: true,
-    read: true,
+    isRead: true,
   },
   {
     text: `Привет! Смотри, тут всплыл интересный кусок лунной космической истории — НАСА в какой-то момент попросила Хассельблад адаптировать модель SWC для полетов на Луну. Сейчас мы все знаем что астронавты летали с моделью 500 EL — и к слову говоря, все тушки этих камер все еще находятся на поверхности Луны, так как астронавты с собой забрали только кассеты с пленкой.
 
     Хассельблад в итоге адаптировал SWC для космоса, но что-то пошло не так и на ракету они так никогда и не попали. Всего их было произведено 25 штук, одну из них недавно продали на аукционе за 45000 евро.`,
-    time: "12:45",
+    dateTime: new Date(2025, 4, 12, 12, 45),
     isOwn: false,
   },
 ];
 
-export const chatsMockData = {
-  chats: chats.map((chat) => ({ ...chat, selected: chat.id === selectedChat.id })),
-  selectedChat,
-  messages,
-};
-
 export const userMockData = {
+  avatarUrl: "",
   display_name: "vadimtop",
   email: "vadim@ya.ru",
   login: "vadim123",
