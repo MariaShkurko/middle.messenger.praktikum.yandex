@@ -4,12 +4,12 @@ type TInputCompProps = Props & {
   id: string;
   formId?: string;
   value: string;
-  type?: "text" | "password";
+  type?: "text" | "password" | "email" | "tel";
   placeholder?: string;
   disabled?: boolean;
 };
 
-export default class InputComp extends Block {
+export default class InputComp extends Block<TInputCompProps> {
   constructor(props: TInputCompProps) {
     const attrs: Record<string, string> = {
       id: props.id ?? "",

@@ -6,7 +6,7 @@ type TInputProps = Props & {
   formId?: string;
   label?: string;
   value: string;
-  type?: "text" | "password";
+  type?: "text" | "password" | "email" | "tel";
   errorMessage?: string;
   variant?: "standard" | "outlined" | "line";
   className?: string;
@@ -19,16 +19,13 @@ type TInputProps = Props & {
 const getClassName = (props: TInputProps) => {
   const { variant = "standard", errorMessage, className } = props;
   const classNames = ["input-field", `input-field--${variant}`];
-  if (errorMessage) {
-    classNames.push("input-field--error");
-  }
   if (className) {
     classNames.push(className);
   }
   return classNames.join(" ");
 };
 
-export default class Input extends Block {
+export default class Input extends Block<TInputProps> {
   constructor(props: TInputProps) {
     const events: Record<string, (e: Event) => void> = {
       change: props.onChange,
@@ -39,7 +36,6 @@ export default class Input extends Block {
     super("div", {
       ...props,
       className: getClassName(props),
-      change: props.onChange,
       Input: new InputComp({
         ...props,
         placeholder: props.label,
@@ -47,6 +43,24 @@ export default class Input extends Block {
         events,
       }),
     });
+  }
+
+  protected componentDidUpdate(_oldProps: TInputProps, _newProps: TInputProps): boolean {
+    if (_oldProps.errorMessage !== _newProps.errorMessage) {
+      if (_newProps.errorMessage) {
+        this.addClassName("input-field--error");
+      } else {
+        this.removeClassName("input-field--error");
+      }
+
+      return true;
+    }
+
+    if (_oldProps.value !== _newProps.value) {
+      return true;
+    }
+
+    return false;
   }
 
   public render(): string {
