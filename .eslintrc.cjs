@@ -2,21 +2,24 @@ module.exports = {
   root: true,
   parser: '@typescript-eslint/parser',
   parserOptions: {
-    ecmaVersion: 2020,
+    ecmaVersion: 2022,
     sourceType: 'module',
     project: './tsconfig.json',
   },
   env: {
     browser: true,
-    es2020: true,
+    es2022: true,
   },
   extends: [
-    'airbnb-base',
+    'eslint:recommended',
     'plugin:@typescript-eslint/recommended',
     'plugin:@typescript-eslint/recommended-requiring-type-checking',
     'plugin:prettier/recommended',
   ],
-  plugins: ['@typescript-eslint'],
+  plugins: [
+    '@typescript-eslint',
+    'import',
+  ],
   rules: {
     'import/extensions': [
       'error',
@@ -26,11 +29,13 @@ module.exports = {
         js: 'ignorePackages',
       },
     ],
-    'no-console': 'warn',
-    '@typescript-eslint/no-unused-vars': ['warn'],
+    'no-console': ['warn', { allow: ['warn', 'error'] }],
+    "no-unused-vars": ["warn", { args: "none", ignoreRestSiblings: true }],
+    '@typescript-eslint/no-unused-vars': ['warn', { args: 'none', ignoreRestSiblings: true }],
     'prettier/prettier': ['error'],
     'import/prefer-default-export': 'off',
-    'no-use-before-define': ['error', { 'functions': true, 'classes': true, 'variables': true, 'typedefs': false }],
+    'no-use-before-define': 'off',
+    '@typescript-eslint/no-use-before-define': ['error', { functions: false, classes: false, variables: true }],
   },
   settings: {
     'import/resolver': {
