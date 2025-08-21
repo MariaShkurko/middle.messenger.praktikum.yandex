@@ -30,6 +30,7 @@ module.exports = {
     '@typescript-eslint/no-unused-vars': ['warn'],
     'prettier/prettier': ['error'],
     'import/prefer-default-export': 'off',
+    'no-use-before-define': ['error', { 'functions': true, 'classes': true, 'variables': true, 'typedefs': false }],
   },
   settings: {
     'import/resolver': {
