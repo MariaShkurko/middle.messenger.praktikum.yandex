@@ -1,17 +1,16 @@
 import { Button, Input } from "../../components";
 import { INPUT_NAME } from "../../constants/INPUT_NAME";
 import Block, { type Props } from "../../core/Block";
+import { go } from "../../core/navigate";
 import { validateInput } from "../../utils/validateForm";
 
+type TLoginFormData = {
+  login: string;
+  password: string;
+};
 type TLoginPageProps = Props & {
-  formState: {
-    login: string;
-    password: string;
-  };
-  errors: {
-    login: string;
-    password: string;
-  };
+  formState: TLoginFormData;
+  errors: TLoginFormData;
 };
 
 export default class LoginPage extends Block<TLoginPageProps> {
@@ -25,17 +24,44 @@ export default class LoginPage extends Block<TLoginPageProps> {
       password: "",
     };
 
+    const allValidateInput = (): boolean => {
+      let isValid = true;
+
+      const newErrors: TLoginFormData = { ...errors };
+      for (const key in formState) {
+        const err = validateInput(key, formState[key as keyof TLoginFormData]);
+        newErrors[key as keyof TLoginFormData] = err;
+        if (err !== "") {
+          isValid = false;
+        }
+      }
+
+      this.setProps({
+        errors: newErrors,
+      });
+
+      return isValid;
+    };
     const onChange = (id: string, value: string) => {
       this.setProps({
         formState: {
           ...this.props.formState,
           [id]: value,
         },
+      });
+    };
+    const onValidate = (id: string, value: string) => {
+      this.setProps({
         errors: {
           ...this.props.errors,
           [id]: validateInput(id, value),
         },
       });
+    };
+    const onSignIn = () => {
+      if (allValidateInput()) {
+        console.log(this.props.formState);
+      }
     };
 
     const InputLogin = new Input({
@@ -49,6 +75,10 @@ export default class LoginPage extends Block<TLoginPageProps> {
         const target = e.target as HTMLInputElement;
         onChange(INPUT_NAME.LOGIN, target.value);
       },
+      onBlur: (e) => {
+        const target = e.target as HTMLInputElement;
+        onValidate(INPUT_NAME.LOGIN, target.value);
+      },
     });
     const InputPassword = new Input({
       id: INPUT_NAME.PASSWORD,
@@ -61,15 +91,21 @@ export default class LoginPage extends Block<TLoginPageProps> {
         const target = e.target as HTMLInputElement;
         onChange(INPUT_NAME.PASSWORD, target.value);
       },
+      onBlur: (e) => {
+        const target = e.target as HTMLInputElement;
+        onValidate(INPUT_NAME.PASSWORD, target.value);
+      },
     });
     const SignInButton = new Button({
       label: "Авторизоваться",
       variant: "primary",
-      page: "chats",
       type: "submit",
       onClick: (e) => {
         e.preventDefault();
-        console.log(this.props.formState);
+        if (allValidateInput()) {
+          console.log(this.props.formState);
+          go("chats");
+        }
       },
     });
     const SignUpButton = new Button({
@@ -97,23 +133,23 @@ export default class LoginPage extends Block<TLoginPageProps> {
   protected componentDidUpdate(_oldProps: TLoginPageProps, _newProps: TLoginPageProps): boolean {
     if (_oldProps.formState.login !== _newProps.formState.login) {
       if (!Array.isArray(this.children.InputLogin)) {
-        this.children.InputLogin.setProps({ value: _newProps.formState.login });
+        return true;
       }
     }
     if (_oldProps.errors.login !== _newProps.errors.login) {
       if (!Array.isArray(this.children.InputLogin)) {
-        this.children.InputLogin.setProps({ errorMessage: _newProps.errors.login });
+        return true;
       }
     }
 
     if (_oldProps.formState.password !== _newProps.formState.password) {
       if (!Array.isArray(this.children.InputPassword)) {
-        this.children.InputPassword.setProps({ value: _newProps.formState.password });
+        return true;
       }
     }
     if (_oldProps.errors.password !== _newProps.errors.password) {
       if (!Array.isArray(this.children.InputPassword)) {
-        this.children.InputPassword.setProps({ errorMessage: _newProps.errors.password });
+        return true;
       }
     }
 

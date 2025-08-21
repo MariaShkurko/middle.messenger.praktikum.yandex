@@ -203,11 +203,7 @@ export default class RegistrationPage extends Block<TRegistrationPageProps> {
       if (_newProps.formState[keyProp] !== _oldProps.formState[keyProp]) {
         const childrenName = RegistrationPage.FIELDS[key];
         if (!Array.isArray(this.children[childrenName])) {
-          console.log(
-            "🚀 ~ RegistrationPage ~ Object.keys ~ this.children[childrenName]:",
-            this.children[childrenName],
-          );
-          this.children[childrenName].setProps({ value: _newProps.formState[keyProp] });
+          return true;
         }
       }
     });
@@ -216,12 +212,12 @@ export default class RegistrationPage extends Block<TRegistrationPageProps> {
       if (_newProps.errors[keyProp] !== _oldProps.errors[keyProp]) {
         const childrenName = RegistrationPage.FIELDS[key];
         if (!Array.isArray(this.children[childrenName])) {
-          this.children[childrenName].setProps({ errorMessage: _newProps.errors[keyProp] });
           if (_newProps.errors[keyProp]) {
             this.children[childrenName].addClassName("login__input--error");
           } else {
             this.children[childrenName].removeClassName("login__input--error");
           }
+          return true;
         }
       }
     });
