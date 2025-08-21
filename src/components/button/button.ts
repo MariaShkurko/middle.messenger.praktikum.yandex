@@ -18,7 +18,7 @@ const getClassName = (props: TButtonProps) => {
   return classNames.join(" ");
 };
 
-export default class Button extends Block {
+export default class Button extends Block<TButtonProps> {
   constructor(props: TButtonProps) {
     const attrs: Record<string, string> = {};
     if (props.page) attrs["data-page"] = props.page;
