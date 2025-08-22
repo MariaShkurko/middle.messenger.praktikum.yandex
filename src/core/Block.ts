@@ -2,6 +2,7 @@ import Handlebars from "handlebars";
 import { v4 as makeUUID } from "uuid";
 import type { IAppEvents } from "../types/eventTypes";
 import EventBus from "./EventBus";
+import { BLOCK_EVENTS } from "../constants/BLOCK_EVENTS";
 
 type EventHandler = (e: Event) => void;
 type Events = Record<string, EventHandler>;
@@ -25,20 +26,13 @@ interface Meta<T = Props> {
 }
 
 class Block<TProps extends Props = Props> {
-  static EVENTS = {
-    INIT: "init",
-    FLOW_CDM: "flow:component-did-mount",
-    FLOW_CDU: "flow:component-did-update",
-    FLOW_RENDER: "flow:render",
-  };
-
   #element: HTMLElement | null = null;
 
   #meta: Meta<TProps>;
 
   #id: string = makeUUID();
 
-  #eventBus: EventBus<IAppEvents>;
+  #eventBus: EventBus<IAppEvents<TProps>>;
 
   protected children: Children;
 
@@ -49,10 +43,10 @@ class Block<TProps extends Props = Props> {
     this.children = children;
     this.#meta = { tagName, props };
 
-    this.#eventBus = new EventBus<IAppEvents>();
+    this.#eventBus = new EventBus<IAppEvents<TProps>>();
     this.props = this.#makePropsProxy(props);
     this.#registerEvents(this.#eventBus);
-    this.#eventBus.emit(Block.EVENTS.INIT);
+    this.#eventBus.emit(BLOCK_EVENTS.INIT);
   }
 
   #makePropsProxy(props: TProps): TProps {
@@ -77,7 +71,7 @@ class Block<TProps extends Props = Props> {
             if (typeof val !== "function") oldTarget[key as keyof TProps] = val;
           });
           const result = Reflect.set(target, prop, value, receiver);
-          emit(Block.EVENTS.FLOW_CDU, oldTarget, target);
+          emit(BLOCK_EVENTS.FLOW_CDU, oldTarget, target);
           return result;
         }
         throw new Error("Invalid prop key type");
@@ -92,11 +86,11 @@ class Block<TProps extends Props = Props> {
     return document.createElement(tagName);
   }
 
-  #registerEvents(eventBus: EventBus<IAppEvents>): void {
-    eventBus.on(Block.EVENTS.INIT, this.init.bind(this));
-    eventBus.on(Block.EVENTS.FLOW_CDM, this.#componentDidMount.bind(this));
-    eventBus.on(Block.EVENTS.FLOW_CDU, this.#componentDidUpdate.bind(this));
-    eventBus.on(Block.EVENTS.FLOW_RENDER, this.#render.bind(this));
+  #registerEvents(eventBus: EventBus<IAppEvents<TProps>>): void {
+    eventBus.on(BLOCK_EVENTS.INIT, this.init.bind(this));
+    eventBus.on(BLOCK_EVENTS.FLOW_CDM, this.#componentDidMount.bind(this));
+    eventBus.on(BLOCK_EVENTS.FLOW_CDU, this.#componentDidUpdate.bind(this));
+    eventBus.on(BLOCK_EVENTS.FLOW_RENDER, this.#render.bind(this));
   }
 
   #createResources(): void {
@@ -174,7 +168,7 @@ class Block<TProps extends Props = Props> {
   #componentDidUpdate(oldProps: TProps, newProps: TProps): void {
     const shouldUpdate = this.componentDidUpdate(oldProps, newProps);
     if (shouldUpdate) {
-      this.#eventBus.emit(Block.EVENTS.FLOW_RENDER);
+      this.#eventBus.emit(BLOCK_EVENTS.FLOW_RENDER);
     }
   }
 
@@ -225,7 +219,7 @@ class Block<TProps extends Props = Props> {
 
   protected init(): void {
     this.#createResources();
-    this.#eventBus.emit(Block.EVENTS.FLOW_RENDER);
+    this.#eventBus.emit(BLOCK_EVENTS.FLOW_RENDER);
   }
 
   protected componentDidMount(_oldProps?: TProps): void {}
@@ -247,18 +241,18 @@ class Block<TProps extends Props = Props> {
   }
 
   public dispatchComponentDidMount(): void {
-    this.#eventBus.emit(Block.EVENTS.FLOW_CDM);
+    this.#eventBus.emit(BLOCK_EVENTS.FLOW_CDM);
   }
 
   public dispatchComponentDidUpdate(): void {
-    this.#eventBus.emit(Block.EVENTS.FLOW_CDU);
+    this.#eventBus.emit(BLOCK_EVENTS.FLOW_CDU);
   }
 
   public setProps(nextProps: Partial<TProps>): void {
     if (!nextProps) return;
     const oldProps = JSON.parse(JSON.stringify(this.props)) as TProps;
     Object.assign(this.props, nextProps);
-    this.#eventBus.emit(Block.EVENTS.FLOW_CDU, oldProps, this.props);
+    this.#eventBus.emit(BLOCK_EVENTS.FLOW_CDU, oldProps, this.props);
   }
 
   public get element(): HTMLElement | null {

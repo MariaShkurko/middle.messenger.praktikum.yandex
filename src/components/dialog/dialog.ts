@@ -56,7 +56,7 @@ export default class Dialog extends Block<TDialogProps> {
         variant: "icon",
         type: "submit",
         icon: arrowIcon,
-        onClick: (e: Event) => {
+        onClick: () => {
           if (Array.isArray(this.children.messageComponents)) {
             this.children.messageComponents.push(
               new Message({ text: inputValue, dateTime: new Date(), isOwn: true }),

@@ -2,7 +2,7 @@ import Block, { type Props } from "../../core/Block";
 
 type TModalProps = Props & {
   active: boolean;
-  children: Block;
+  children: string;
 };
 
 export default class Modal extends Block<TModalProps> {

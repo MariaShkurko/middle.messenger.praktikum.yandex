@@ -60,10 +60,8 @@ class HTTP {
       const isGet = method === METHODS.GET;
       xhr.open(method, isGet && !!data ? `${url}${queryStringify(data)}` : url);
 
-      // Установить таймаут
       xhr.timeout = timeout;
 
-      // Установить заголовки
       Object.entries(headers).forEach(([key, value]) => {
         xhr.setRequestHeader(key, value);
       });

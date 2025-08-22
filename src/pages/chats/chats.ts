@@ -45,7 +45,7 @@ export default class ChatsPage extends Block<TChatsPageProps> {
               ...chat,
               selected: false,
               events: {
-                click: (e: Event) => {
+                click: () => {
                   this.setProps({
                     selectedChatId: chat.id,
                   });
