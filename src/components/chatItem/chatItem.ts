@@ -99,15 +99,19 @@ export default class ChatItem extends Block<TChatItemProps> {
   }
 
   protected render(): string {
+    const unreadCountBage = this.props.unreadCount
+      ? `<div class="chat-item__badge">{{unreadCount}}</div>`
+      : `<div class="chat-item__badge chat-item__badge--empty">{{unreadCount}}</div>`;
+
     return `
       {{{ ContactAvatar }}}
       <div class="chat-item__info">
-        <span class="chat-item__name">{{name}}</span>
+        <span class="chat-item__name">{{contact.name}}</span>
         <span class="chat-item__last">{{lastMessageText}}</span>
       </div>
       <div class="chat-item__meta-info">
         <span class="chat-item__time">{{lastMessageTime}}</span>
-        <div class="chat-item__badge chat-item__badge--empty">{{unreadCount}}</div>
+        ${unreadCountBage}
       </div>
     `;
   }
