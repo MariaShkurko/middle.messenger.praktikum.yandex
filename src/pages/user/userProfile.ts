@@ -1,39 +1,43 @@
-import { Avatar, Button, Input } from "../../components";
+import { Avatar, Button, Input, Modal } from "../../components";
 import Block, { type Props } from "../../core/Block";
 import arrowIcon from "../../assets/arrow-icon.svg?raw";
 import { validateInput } from "../../utils/validateForm";
 import { INPUT_NAME } from "../../constants/INPUT_NAME";
 import { userMockData } from "../../mockData";
+import UserAvatarButton from "./userAvatarButton";
 
-type TUserProfilePage = Props & {
-  formState: {
-    email: string;
-    login: string;
-    firstName: string;
-    secondName: string;
-    displayName: string;
-    phone: string;
-  };
-  errors: {
-    email: string;
-    login: string;
-    firstName: string;
-    secondName: string;
-    displayName: string;
-    phone: string;
-  };
+type TUserProfileFormData = {
+  email: string;
+  login: string;
+  firstName: string;
+  secondName: string;
+  displayName: string;
+  phone: string;
+};
+type TUserProfilePageProps = Props & {
+  formState: TUserProfileFormData;
+  errors: TUserProfileFormData;
   isEdit: boolean;
 };
 
-export default class UserProfilePage extends Block<TUserProfilePage> {
+export default class UserProfilePage extends Block<TUserProfilePageProps> {
+  static FIELDS = {
+    [INPUT_NAME.EMAIL]: "InputEmail",
+    [INPUT_NAME.LOGIN]: "InputLogin",
+    [INPUT_NAME.FIRST_NAME]: "InputFirstName",
+    [INPUT_NAME.SECOND_NAME]: "InputSecondName",
+    [INPUT_NAME.DISPLAY_NAME]: "InputDisplayName",
+    [INPUT_NAME.PHONE]: "InputPhone",
+  };
+
   constructor() {
     const formState = {
-      email: "",
-      login: "",
-      firstName: "",
-      secondName: "",
-      displayName: "",
-      phone: "",
+      email: userMockData.email,
+      login: userMockData.login,
+      firstName: userMockData.first_name,
+      secondName: userMockData.second_name,
+      displayName: userMockData.display_name,
+      phone: userMockData.phone,
     };
     const errors = {
       email: "",
@@ -45,12 +49,34 @@ export default class UserProfilePage extends Block<TUserProfilePage> {
     };
     const isEdit = false;
 
+    const allValidateInput = (): boolean => {
+      let isValid = true;
+
+      const newErrors: TUserProfileFormData = { ...this.props.errors };
+      for (const key in this.props.formState) {
+        const err = validateInput(key, this.props.formState[key as keyof TUserProfileFormData]);
+        newErrors[key as keyof TUserProfileFormData] = err;
+        if (err !== "") {
+          isValid = false;
+        }
+      }
+
+      this.setProps({
+        errors: newErrors,
+      });
+
+      return isValid;
+    };
     const onChange = (id: string, value: string) => {
       this.setProps({
         formState: {
           ...this.props.formState,
           [id]: value,
         },
+      });
+    };
+    const onValidate = (id: string, value: string) => {
+      this.setProps({
         errors: {
           ...this.props.errors,
           [id]: validateInput(id, value),
@@ -67,6 +93,7 @@ export default class UserProfilePage extends Block<TUserProfilePage> {
       icon: arrowIcon,
       onClick: (e: Event) => {
         e.preventDefault();
+        // eslint-disable-next-line no-console
         console.log("navigate to chats");
       },
     });
@@ -86,6 +113,7 @@ export default class UserProfilePage extends Block<TUserProfilePage> {
       type: "button",
       onClick: (e) => {
         e.preventDefault();
+        // eslint-disable-next-line no-console
         console.log("navigate to edit password");
       },
     });
@@ -96,6 +124,7 @@ export default class UserProfilePage extends Block<TUserProfilePage> {
       type: "button",
       onClick: (e) => {
         e.preventDefault();
+        // eslint-disable-next-line no-console
         console.log("navigate to login");
       },
     });
@@ -105,14 +134,23 @@ export default class UserProfilePage extends Block<TUserProfilePage> {
       type: "submit",
       onClick: (e) => {
         e.preventDefault();
-        console.log(this.props.formState);
-        onChangeIsEdit(false);
+        if (allValidateInput()) {
+          // eslint-disable-next-line no-console
+          console.log(this.props.formState);
+          onChangeIsEdit(false);
+        }
       },
     });
     const UserAvatar = new Avatar({
       width: "130px",
       height: "130px",
       avatarUrl: userMockData.avatarUrl,
+    });
+    const UserAvatarBtn = new UserAvatarButton(UserAvatar, (e) => {
+      e.preventDefault();
+      if (!Array.isArray(this.children.ModalChangeAvatar)) {
+        this.children.ModalChangeAvatar.setProps({ active: true });
+      }
     });
     const InputEmail = new Input({
       id: INPUT_NAME.EMAIL,
@@ -125,6 +163,10 @@ export default class UserProfilePage extends Block<TUserProfilePage> {
       onChange: (e) => {
         const target = e.target as HTMLInputElement;
         onChange(INPUT_NAME.EMAIL, target.value);
+      },
+      onBlur: (e) => {
+        const target = e.target as HTMLInputElement;
+        onValidate(INPUT_NAME.EMAIL, target.value);
       },
     });
     const InputLogin = new Input({
@@ -139,6 +181,10 @@ export default class UserProfilePage extends Block<TUserProfilePage> {
         const target = e.target as HTMLInputElement;
         onChange(INPUT_NAME.LOGIN, target.value);
       },
+      onBlur: (e) => {
+        const target = e.target as HTMLInputElement;
+        onValidate(INPUT_NAME.LOGIN, target.value);
+      },
     });
     const InputFirstName = new Input({
       id: INPUT_NAME.FIRST_NAME,
@@ -151,6 +197,10 @@ export default class UserProfilePage extends Block<TUserProfilePage> {
       onChange: (e) => {
         const target = e.target as HTMLInputElement;
         onChange(INPUT_NAME.FIRST_NAME, target.value);
+      },
+      onBlur: (e) => {
+        const target = e.target as HTMLInputElement;
+        onValidate(INPUT_NAME.FIRST_NAME, target.value);
       },
     });
     const InputSecondName = new Input({
@@ -165,6 +215,10 @@ export default class UserProfilePage extends Block<TUserProfilePage> {
         const target = e.target as HTMLInputElement;
         onChange(INPUT_NAME.SECOND_NAME, target.value);
       },
+      onBlur: (e) => {
+        const target = e.target as HTMLInputElement;
+        onValidate(INPUT_NAME.SECOND_NAME, target.value);
+      },
     });
     const InputDisplayName = new Input({
       id: INPUT_NAME.DISPLAY_NAME,
@@ -177,6 +231,10 @@ export default class UserProfilePage extends Block<TUserProfilePage> {
       onChange: (e) => {
         const target = e.target as HTMLInputElement;
         onChange(INPUT_NAME.DISPLAY_NAME, target.value);
+      },
+      onBlur: (e) => {
+        const target = e.target as HTMLInputElement;
+        onValidate(INPUT_NAME.DISPLAY_NAME, target.value);
       },
     });
     const InputPhone = new Input({
@@ -191,6 +249,40 @@ export default class UserProfilePage extends Block<TUserProfilePage> {
         const target = e.target as HTMLInputElement;
         onChange(INPUT_NAME.PHONE, target.value);
       },
+      onBlur: (e) => {
+        const target = e.target as HTMLInputElement;
+        onValidate(INPUT_NAME.PHONE, target.value);
+      },
+    });
+    const SubmitAvatarButton = new Button({
+      label: "Изменить",
+      type: "submit",
+      className: "avatar-modal__submit",
+      onClick: (e) => {
+        e.preventDefault();
+        const form = document.getElementById("user-avatar-form") as HTMLFormElement;
+        const formData = new FormData(form);
+        // eslint-disable-next-line no-console
+        console.log("upload avatar", formData.get("avatar"));
+        if (!Array.isArray(this.children.ModalChangeAvatar)) {
+          this.children.ModalChangeAvatar.setProps({ active: false });
+        }
+      },
+    });
+    const ModalChangeAvatar = new Modal({
+      id: "change-avatar-modal",
+      active: false,
+      children: `
+        <form id="user-avatar-form">
+          <p class="modal__title">Загрузите файл</p>
+          <label class="avatar-modal__file-label">
+            <input type="file" name="avatar" accept="image/*" class="avatar-modal__file-input" />
+            <span class="avatar-modal__file-text">Выбрать файл на компьютере</span>
+          </label>
+          {{{ SubmitAvatarButton }}}
+        </form>
+      `,
+      SubmitAvatarButton,
     });
 
     super("div", {
@@ -201,6 +293,7 @@ export default class UserProfilePage extends Block<TUserProfilePage> {
       className: "user-profile",
       BackButton,
       UserAvatar,
+      UserAvatarBtn,
       InputEmail,
       InputLogin,
       InputFirstName,
@@ -211,7 +304,52 @@ export default class UserProfilePage extends Block<TUserProfilePage> {
       EditPasswordButton,
       ExitButton,
       SubmitButton,
+      SubmitAvatarButton,
+      ModalChangeAvatar,
     });
+  }
+
+  protected componentDidUpdate(
+    _oldProps: TUserProfilePageProps,
+    _newProps: TUserProfilePageProps,
+  ): boolean {
+    Object.keys(_newProps.formState).forEach((key) => {
+      const keyProp = key as keyof TUserProfilePageProps["formState"];
+      if (_newProps.formState[keyProp] !== _oldProps.formState[keyProp]) {
+        const childrenName = UserProfilePage.FIELDS[key];
+        if (!Array.isArray(this.children[childrenName])) {
+          this.children[childrenName].setProps({
+            value: _newProps.formState[keyProp],
+          });
+          return true;
+        }
+      }
+    });
+    Object.keys(_newProps.errors).forEach((key) => {
+      const keyProp = key as keyof TUserProfilePageProps["errors"];
+      if (_newProps.errors[keyProp] !== _oldProps.errors[keyProp]) {
+        const childrenName = UserProfilePage.FIELDS[key];
+        if (!Array.isArray(this.children[childrenName])) {
+          this.children[childrenName].setProps({
+            errorMessage: _newProps.errors[keyProp],
+          });
+          return true;
+        }
+      }
+    });
+
+    if (_oldProps.isEdit !== _newProps.isEdit) {
+      Object.values(UserProfilePage.FIELDS).forEach((childrenName) => {
+        if (!Array.isArray(this.children[childrenName])) {
+          this.children[childrenName].setProps({
+            disabled: !_newProps.isEdit,
+          });
+        }
+      });
+      return true;
+    }
+
+    return false;
   }
 
   render() {
@@ -243,7 +381,7 @@ export default class UserProfilePage extends Block<TUserProfilePage> {
         <form id="user-profile-form">
 
           <div class="user-profile__short-info">
-            {{{ UserAvatar }}}
+            {{{ UserAvatarBtn }}}
             <p>{{user.display_name}}</p>
           </div>
 
@@ -277,18 +415,7 @@ export default class UserProfilePage extends Block<TUserProfilePage> {
         </form>
       </div>
 
-      {{#> Modal id="change-avatar-modal" active=false }}
-        <form id="user-avatar-form">
-          <p class="modal__title">Загрузите файл</p>
-
-          <label class="avatar-modal__file-label">
-            <input type="file" name="avatar" accept="image/*" class="avatar-modal__file-input" />
-            <span class="avatar-modal__file-text">Выбрать файл на компьютере</span>
-          </label>
-
-          {{> Button label="Поменять" type="submit" class="avatar-modal__submit" }}
-        </form>
-      {{/Modal}}
+      {{{ ModalChangeAvatar }}}
     `;
   }
 }
