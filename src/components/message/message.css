@@ -29,7 +29,6 @@
 
   &__time {
     float: right;
-    /* margin-top: -9px; */
     font-size: 9px;
     line-height: 9px;
     color: var(--text-secondary-color);
@@ -42,7 +41,7 @@
       border-radius: 30px;
       padding: 2px 7px;
       color: var(--white-color);
-      background-color: rgba(82, 82, 82, 0.5);
+      background-color: rgb(82 82 82 / 50%);
     }
   }
 }
