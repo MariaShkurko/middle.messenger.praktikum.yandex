@@ -3,6 +3,7 @@
 ## Ссылки на PR спринтов
 
 - [sprint_1](https://github.com/MariaShkurko/middle.messenger.praktikum.yandex/pull/3)
+- [sprint_2](https://github.com/MariaShkurko/middle.messenger.praktikum.yandex/pull/5)
 
 ---
 
@@ -11,6 +12,7 @@
 Приложение представляет собой веб-мессенджер с базовым функционалом: регистрация, авторизация, отправка сообщений, редактирование профиля и смена пароля.
 
 Проект демонстрирует:
+
 - создание компонентов на Handlebars;
 - работу с REST API;
 - маршрутизацию без перезагрузки страницы;
@@ -24,16 +26,15 @@ Figma: https://www.figma.com/design/nyCcHdBKIdxAuihydRQjl2/middle.messenger.prak
 
 ## Ссылки на сверстанные страницы
 
-| Страница               | Путь               |
-|------------------------|--------------------|
-| Авторизация            | https://vite-messenger.netlify.app/login           |
-| Регистрация            | https://vite-messenger.netlify.app/registration    |
-| Список чатов + чат     | https://vite-messenger.netlify.app/chats           |
-| Профиль пользователя   | https://vite-messenger.netlify.app/user-profile    |
-| Редактирование профиля | https://vite-messenger.netlify.app/edit-user-profile |
-| Смена пароля           | https://vite-messenger.netlify.app/edit-password   |
-| Ошибка 404             | https://vite-messenger.netlify.app/404.html        |
-| Ошибка 500             | https://vite-messenger.netlify.app/500.html        |
+| Страница             | Путь                                             |
+| -------------------- | ------------------------------------------------ |
+| Авторизация          | https://vite-messenger.netlify.app/login         |
+| Регистрация          | https://vite-messenger.netlify.app/registration  |
+| Список чатов + чат   | https://vite-messenger.netlify.app/chats         |
+| Профиль пользователя | https://vite-messenger.netlify.app/user-profile  |
+| Смена пароля         | https://vite-messenger.netlify.app/edit-password |
+| Ошибка 404           | https://vite-messenger.netlify.app/404.html      |
+| Ошибка 500           | https://vite-messenger.netlify.app/500.html      |
 
 ---
 
@@ -51,6 +52,10 @@ npm install
 
 - `npm run dev` — запуск в режиме разработки (Vite)
 - `npm run start` — сборка и запуск production-версии на порту `3000`
+
+### Валидация проекта
+
+- `npm run lint` - запуск проверки типов TS, линтеров ESLint и StyleLint
 
 ---
 
@@ -70,5 +75,9 @@ npm install
 ## 🧑‍💻 Стандарты разработки
 
 - Настроен Stylelint для `.css`
-- Компоненты реализуются в формате: `Component.hbs` + `Component.css`
+- Настроен ESLint для `.ts`
+- Настроен Prettier для поддержания единого стиля кода
+- Используется TypeScript с запретом any
+- Компоненты реализуются в формате: `index.ts` + `Component.ts` + `Component.css`
 - Используется БЭМ-нейминг в стилях
+- Настроен pre-commit и pre-push с помощью Husky
