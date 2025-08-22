@@ -1,7 +1,7 @@
 import { Button, ChatItem, Dialog, Input } from "../../components";
 import Block, { type Props } from "../../core/Block";
 import searchIcon from "../../assets/search-icon.svg?raw";
-import { chats as chatsMockData, messages } from "../../mockData.ts";
+import { chats as chatsMockData, messages } from "../../mockData";
 
 type TChatsPageProps = Props & {
   searchValue: string;
@@ -20,6 +20,7 @@ export default class ChatsPage extends Block<TChatsPageProps> {
       className: "chats__button-link",
       onClick: (e) => {
         e.preventDefault();
+        // eslint-disable-next-line no-console
         console.log("navigate to user-profile");
       },
     });

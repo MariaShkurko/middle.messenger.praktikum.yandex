@@ -1,27 +1,21 @@
 import { Button, Input } from "../../components";
 import { INPUT_NAME } from "../../constants/INPUT_NAME";
 import Block, { type Props } from "../../core/Block";
+import { go } from "../../core/router";
 import { validateInput } from "../../utils/validateForm";
 
+type TRegistrationFormData = {
+  email: string;
+  login: string;
+  first_name: string;
+  second_name: string;
+  phone: string;
+  password: string;
+  again_password: string;
+};
 type TRegistrationPageProps = Props & {
-  formState: {
-    email: string;
-    login: string;
-    first_name: string;
-    second_name: string;
-    phone: string;
-    password: string;
-    again_password: string;
-  };
-  errors: {
-    email: string;
-    login: string;
-    first_name: string;
-    second_name: string;
-    phone: string;
-    password: string;
-    again_password: string;
-  };
+  formState: TRegistrationFormData;
+  errors: TRegistrationFormData;
 };
 
 export default class RegistrationPage extends Block<TRegistrationPageProps> {
@@ -55,12 +49,34 @@ export default class RegistrationPage extends Block<TRegistrationPageProps> {
       again_password: "",
     };
 
+    const allValidateInput = (): boolean => {
+      let isValid = true;
+
+      const newErrors: TRegistrationFormData = { ...this.props.errors };
+      for (const key in this.props.formState) {
+        const err = validateInput(key, this.props.formState[key as keyof TRegistrationFormData]);
+        newErrors[key as keyof TRegistrationFormData] = err;
+        if (err !== "") {
+          isValid = false;
+        }
+      }
+
+      this.setProps({
+        errors: newErrors,
+      });
+
+      return isValid;
+    };
     const onChange = (id: string, value: string) => {
       this.setProps({
         formState: {
           ...this.props.formState,
           [id]: value,
         },
+      });
+    };
+    const onValidate = (id: string, value: string) => {
+      this.setProps({
         errors: {
           ...this.props.errors,
           [id]: validateInput(id, value),
@@ -80,6 +96,10 @@ export default class RegistrationPage extends Block<TRegistrationPageProps> {
         const target = e.target as HTMLInputElement;
         onChange(INPUT_NAME.EMAIL, target.value);
       },
+      onBlur: (e) => {
+        const target = e.target as HTMLInputElement;
+        onValidate(INPUT_NAME.EMAIL, target.value);
+      },
     });
     const InputLogin = new Input({
       id: INPUT_NAME.LOGIN,
@@ -91,6 +111,10 @@ export default class RegistrationPage extends Block<TRegistrationPageProps> {
       onChange: (e) => {
         const target = e.target as HTMLInputElement;
         onChange(INPUT_NAME.LOGIN, target.value);
+      },
+      onBlur: (e) => {
+        const target = e.target as HTMLInputElement;
+        onValidate(INPUT_NAME.LOGIN, target.value);
       },
     });
     const InputFirstName = new Input({
@@ -104,6 +128,10 @@ export default class RegistrationPage extends Block<TRegistrationPageProps> {
         const target = e.target as HTMLInputElement;
         onChange(INPUT_NAME.FIRST_NAME, target.value);
       },
+      onBlur: (e) => {
+        const target = e.target as HTMLInputElement;
+        onValidate(INPUT_NAME.FIRST_NAME, target.value);
+      },
     });
     const InputSecondName = new Input({
       id: INPUT_NAME.SECOND_NAME,
@@ -115,6 +143,10 @@ export default class RegistrationPage extends Block<TRegistrationPageProps> {
       onChange: (e) => {
         const target = e.target as HTMLInputElement;
         onChange(INPUT_NAME.SECOND_NAME, target.value);
+      },
+      onBlur: (e) => {
+        const target = e.target as HTMLInputElement;
+        onValidate(INPUT_NAME.SECOND_NAME, target.value);
       },
     });
     const InputPhone = new Input({
@@ -129,6 +161,10 @@ export default class RegistrationPage extends Block<TRegistrationPageProps> {
         const target = e.target as HTMLInputElement;
         onChange(INPUT_NAME.PHONE, target.value);
       },
+      onBlur: (e) => {
+        const target = e.target as HTMLInputElement;
+        onValidate(INPUT_NAME.PHONE, target.value);
+      },
     });
     const InputPassword = new Input({
       id: INPUT_NAME.PASSWORD,
@@ -142,6 +178,10 @@ export default class RegistrationPage extends Block<TRegistrationPageProps> {
         const target = e.target as HTMLInputElement;
         onChange(INPUT_NAME.PASSWORD, target.value);
       },
+      onBlur: (e) => {
+        const target = e.target as HTMLInputElement;
+        onValidate(INPUT_NAME.PASSWORD, target.value);
+      },
     });
     const InputAgainPassword = new Input({
       id: INPUT_NAME.AGAIN_PASSWORD,
@@ -154,16 +194,22 @@ export default class RegistrationPage extends Block<TRegistrationPageProps> {
         const target = e.target as HTMLInputElement;
         onChange(INPUT_NAME.AGAIN_PASSWORD, target.value);
       },
+      onBlur: (e) => {
+        const target = e.target as HTMLInputElement;
+        onValidate(INPUT_NAME.AGAIN_PASSWORD, target.value);
+      },
     });
     const SignUpButton = new Button({
       label: "Зарегистрироваться",
       variant: "primary",
-      page: "chats",
       type: "submit",
       onClick: (e) => {
         e.preventDefault();
-        // eslint-disable-next-line no-console
-        console.log(this.props.formState);
+        if (allValidateInput()) {
+          // eslint-disable-next-line no-console
+          console.log(this.props.formState);
+          go("chats");
+        }
       },
     });
     const SignInButton = new Button({
@@ -203,6 +249,9 @@ export default class RegistrationPage extends Block<TRegistrationPageProps> {
       if (_newProps.formState[keyProp] !== _oldProps.formState[keyProp]) {
         const childrenName = RegistrationPage.FIELDS[key];
         if (!Array.isArray(this.children[childrenName])) {
+          this.children[childrenName].setProps({
+            value: _newProps.formState[keyProp],
+          });
           return true;
         }
       }
@@ -212,11 +261,9 @@ export default class RegistrationPage extends Block<TRegistrationPageProps> {
       if (_newProps.errors[keyProp] !== _oldProps.errors[keyProp]) {
         const childrenName = RegistrationPage.FIELDS[key];
         if (!Array.isArray(this.children[childrenName])) {
-          if (_newProps.errors[keyProp]) {
-            this.children[childrenName].addClassName("login__input--error");
-          } else {
-            this.children[childrenName].removeClassName("login__input--error");
-          }
+          this.children[childrenName].setProps({
+            errorMessage: _newProps.errors[keyProp],
+          });
           return true;
         }
       }

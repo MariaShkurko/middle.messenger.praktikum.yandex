@@ -19,6 +19,9 @@ type TInputProps = Props & {
 const getClassName = (props: TInputProps) => {
   const { variant = "standard", errorMessage, className } = props;
   const classNames = ["input-field", `input-field--${variant}`];
+  if (errorMessage) {
+    classNames.push("input-field--error");
+  }
   if (className) {
     classNames.push(className);
   }
@@ -52,11 +55,28 @@ export default class Input extends Block<TInputProps> {
       } else {
         this.removeClassName("input-field--error");
       }
-
+      if (!Array.isArray(this.children.Input)) {
+        this.children.Input.setProps({
+          errorMessage: _newProps.errorMessage,
+        });
+      }
       return true;
     }
 
     if (_oldProps.value !== _newProps.value) {
+      if (!Array.isArray(this.children.Input)) {
+        this.children.Input.setProps({
+          value: _newProps.value,
+        });
+      }
+      return true;
+    }
+    if (_oldProps.disabled !== _newProps.disabled) {
+      if (!Array.isArray(this.children.Input)) {
+        this.children.Input.setProps({
+          disabled: _newProps.disabled,
+        });
+      }
       return true;
     }
 

@@ -1,7 +1,6 @@
 import Handlebars from "handlebars";
 import { v4 as makeUUID } from "uuid";
 import type { IAppEvents } from "../types/eventTypes";
-import deepClone from "../utils/deepClone";
 import EventBus from "./EventBus";
 
 type EventHandler = (e: Event) => void;
@@ -60,29 +59,26 @@ class Block<TProps extends Props = Props> {
     const emit = this.#eventBus.emit.bind(this.#eventBus);
 
     return new Proxy<TProps>(props, {
-      get: (target: TProps, prop: string | symbol): unknown => {
-        if (typeof prop === "string" && prop in target) {
-          const value = target[prop as keyof TProps];
-          if (typeof value === "function") {
-            return (value as (...args: unknown[]) => unknown).bind(target);
+      get(target, prop, receiver): unknown {
+        if (typeof prop === "string" && Object.prototype.hasOwnProperty.call(target, prop)) {
+          const value = Reflect.get(target, prop, receiver);
+          if (typeof value === "function" && !["caller", "callee", "arguments"].includes(prop)) {
+            return value.bind(target);
           }
           return value;
         }
         return undefined;
       },
-      // set(target, prop: keyof TProps, value) {
-      //   const oldTarget = deepClone(target);
-      //   target[prop] = value;
-      //   emit(Block.EVENTS.FLOW_CDU, oldTarget, target);
-      //   return true;
-      // },
-      set: (target: TProps, prop: string | symbol, value: unknown): boolean => {
-        if (typeof prop === "string" && prop in target) {
-          const oldTarget = deepClone(target);
-          const key = prop as keyof TProps;
-          target[key] = value as TProps[typeof key];
+      set(target, prop, value, receiver): boolean {
+        if (typeof prop === "string" && Object.prototype.hasOwnProperty.call(target, prop)) {
+          const oldTarget: Partial<TProps> = {};
+          Object.keys(target).forEach((key) => {
+            const val = target[key as keyof TProps];
+            if (typeof val !== "function") oldTarget[key as keyof TProps] = val;
+          });
+          const result = Reflect.set(target, prop, value, receiver);
           emit(Block.EVENTS.FLOW_CDU, oldTarget, target);
-          return true;
+          return result;
         }
         throw new Error("Invalid prop key type");
       },
@@ -260,7 +256,7 @@ class Block<TProps extends Props = Props> {
 
   public setProps(nextProps: Partial<TProps>): void {
     if (!nextProps) return;
-    const oldProps = deepClone(this.props);
+    const oldProps = JSON.parse(JSON.stringify(this.props)) as TProps;
     Object.assign(this.props, nextProps);
     this.#eventBus.emit(Block.EVENTS.FLOW_CDU, oldProps, this.props);
   }

@@ -28,7 +28,10 @@ export const validateInput = (inputName: TInputName, value: string): string => {
     }
 
     case INPUT_NAME.PASSWORD:
-    case INPUT_NAME.AGAIN_PASSWORD: {
+    case INPUT_NAME.AGAIN_PASSWORD:
+    case INPUT_NAME.OLD_PASSWORD:
+    case INPUT_NAME.NEW_PASSWORD:
+    case INPUT_NAME.AGAIN_NEW_PASSWORD: {
       const regex = /^(?=.*[A-Z])(?=.*\d)[A-Za-z\d]{8,40}$/;
       if (!regex.test(value)) {
         return "Пароль от 8 до 40 символов, хотя бы одна заглавная буква и цифра";
