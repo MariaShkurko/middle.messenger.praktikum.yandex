@@ -42,4 +42,5 @@ module.exports = {
       typescript: true,
     },
   },
+  ignorePatterns: ['vite.config.js', 'postcss.config.js', '*.cjs'],
 };
