@@ -56,7 +56,7 @@ export default class ChatItem extends Block<TChatItemProps> {
       } else {
         res.text =
           message.text && message.text.length > 50
-            ? message.text?.slice(0, 50) + "..."
+            ? message.text.slice(0, 50) + "..."
             : message.text || "";
       }
 

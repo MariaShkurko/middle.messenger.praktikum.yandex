@@ -12,62 +12,76 @@ type TDialogProps = Props & {
 };
 
 export default class Dialog extends Block<TDialogProps> {
+  private inputValue: string;
+  private inputError: string;
+
   constructor(props: TDialogProps) {
     const showMenu: boolean = false;
-    const inputValue: string = "";
-    const inputError: string = "";
 
     super("div", {
       ...props,
       contact: props.contact || null,
       messages: props.messages || null,
       showMenu,
-      inputValue: "",
       className: `feed${!props.showDialog ? " feed--empty" : ""}`,
-      ContactAvatar: new Avatar({
-        width: "34px",
-        height: "34px",
-        avatarUrl: props.contact?.avatarUrl,
-      }),
-      MenuButton: new MenuButton({
-        onClick: (_e: Event) => {
-          this.setProps({
-            showMenu: true,
-          });
-        },
-      }),
-      InputMessage: new Input({
-        id: INPUT_NAME.MESSAGE,
-        formId: "new-message",
-        label: "Сообщение",
-        value: inputValue,
-        errorMessage: inputError,
-        variant: "outlined",
-        className: "feed__input",
-        onChange: (e) => {
-          const target = e.target as HTMLInputElement;
-          this.setProps({
-            inputValue: target.value,
-            errors: validateInput(INPUT_NAME.MESSAGE, target.value),
-          });
-        },
-      }),
-      SendButton: new Button({
-        variant: "icon",
-        type: "submit",
-        icon: arrowIcon,
-        onClick: () => {
-          if (Array.isArray(this.children.messageComponents)) {
-            this.children.messageComponents.push(
-              new Message({ text: inputValue, dateTime: new Date(), isOwn: true }),
-            );
-            this.dispatchComponentDidUpdate();
-          }
-        },
-      }),
       messageComponents: props.messages
         ? props.messages.map((message) => new Message(message))
         : [],
+    });
+
+    this.inputValue = "";
+    this.inputError = "";
+
+    this.children.ContactAvatar = new Avatar({
+      width: "34px",
+      height: "34px",
+      avatarUrl: props.contact?.avatarUrl,
+    });
+    this.children.MenuButton = new MenuButton({
+      onClick: (_e: Event) => {
+        this.setProps({
+          showMenu: true,
+        });
+      },
+    });
+    this.children.InputMessage = new Input({
+      id: INPUT_NAME.MESSAGE,
+      formId: "new-message",
+      label: "Сообщение",
+      value: this.inputValue,
+      errorMessage: this.inputError,
+      variant: "outlined",
+      className: "feed__input",
+      onChange: (e) => {
+        const target = e.target as HTMLInputElement;
+        this.inputValue = target.value;
+        this.dispatchComponentDidUpdate();
+      },
+      onBlur: (e) => {
+        const target = e.target as HTMLInputElement;
+        this.inputError = validateInput(INPUT_NAME.MESSAGE, target.value);
+        this.dispatchComponentDidUpdate();
+      },
+    });
+    this.children.SendButton = new Button({
+      variant: "icon",
+      type: "submit",
+      icon: arrowIcon,
+      onClick: () => {
+        const error = validateInput(INPUT_NAME.MESSAGE, this.inputValue);
+        this.inputError = error;
+
+        if (!error) {
+          if (Array.isArray(this.children.messageComponents)) {
+            this.children.messageComponents.push(
+              new Message({ text: this.inputValue, dateTime: new Date(), isOwn: true }),
+            );
+            this.dispatchComponentDidUpdate();
+          }
+        }
+
+        this.dispatchComponentDidUpdate();
+      },
     });
   }
 
