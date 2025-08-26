@@ -7,6 +7,8 @@
     min-width: 310px;
     height: 100vh;
     background-color: var(--background-list-color);
+    display: flex;
+    flex-direction: column;
   }
 
   &__header {
@@ -28,9 +30,9 @@
   }
 
   &__list {
-    height: calc(100vh - 105px);
     border-top: 1px solid var(--border-color);
-    overflow: auto;
+    overflow-y: auto;
+    flex: 1;
   }
 
   &__main {

@@ -1,0 +1,8 @@
+node_modules/
+dist/
+public/
+*.hbs
+**/*.min.js
+
+.vscode/*
+*.DS_Store

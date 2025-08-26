@@ -11,18 +11,51 @@
     "build": "tsc && vite build",
     "preview": "vite preview",
     "start": "npm run build && npm run preview",
-    "lint:css": "stylelint \"**/*.css\" --config stylelint.config.cjs"
+    "type-check": "tsc --noEmit",
+    "lint:css": "stylelint \"**/*.css\" --config stylelint.config.cjs",
+    "lint:code": "eslint . --ext .ts --config .eslintrc.cjs",
+    "lint": "npm run type-check && npm run lint:css && npm run lint:code",
+    "format": "prettier --write .",
+    "prepare": "husky"
+  },
+  "lint-staged": {
+    "*.ts": [
+      "eslint --fix",
+      "prettier --write",
+      "tsc --noEmit --pretty"
+    ],
+    "*.css": [
+      "stylelint --fix",
+      "prettier --write"
+    ],
+    "*.{json,md}": [
+      "prettier --write"
+    ]
   },
   "devDependencies": {
-    "autoprefixer": "^10.4.21",
-    "postcss": "^8.5.3",
-    "postcss-nested": "^7.0.2",
-    "postcss-preset-env": "^10.1.6",
-    "stylelint": "^16.19.1",
-    "typescript": "~5.8.3",
-    "vite": "^6.3.5"
+    "@typescript-eslint/eslint-plugin": "8.33.1",
+    "@typescript-eslint/parser": "8.33.1",
+    "autoprefixer": "10.4.21",
+    "eslint": "8.57.1",
+    "eslint-config-airbnb": "19.0.4",
+    "eslint-config-airbnb-base": "15.0.0",
+    "eslint-config-prettier": "10.1.5",
+    "eslint-import-resolver-typescript": "4.4.2",
+    "eslint-plugin-import": "2.32.0",
+    "eslint-plugin-prettier": "5.4.1",
+    "husky": "9.1.7",
+    "lint-staged": "16.1.5",
+    "postcss": "8.5.3",
+    "postcss-nested": "7.0.2",
+    "postcss-preset-env": "10.1.6",
+    "prettier": "3.5.3",
+    "stylelint": "^16.23.1",
+    "stylelint-config-standard": "39.0.0",
+    "typescript": "5.8.3",
+    "vite": "6.3.5"
   },
   "dependencies": {
-    "handlebars": "^4.7.8"
+    "handlebars": "4.7.8",
+    "uuid": "11.1.0"
   }
 }

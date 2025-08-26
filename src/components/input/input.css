@@ -88,6 +88,10 @@
     & input {
       border-color: var(--error-color);
     }
+
+    & label {
+      color: var(--error-color);
+    }
   }
 
   &__left-icon + input {
