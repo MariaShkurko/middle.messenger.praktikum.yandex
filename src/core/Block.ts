@@ -25,7 +25,7 @@ interface Meta<T = Props> {
   props: T;
 }
 
-class Block<TProps extends Props = Props> {
+abstract class Block<TProps extends Props = Props> {
   #element: HTMLElement | null = null;
 
   #meta: Meta<TProps>;

@@ -4,7 +4,7 @@ import Block from "../../core/Block";
 export default class UserAvatarButton extends Block {
   constructor(UserAvatar: Avatar, onClick: (e: Event) => void) {
     super("button", {
-      type: "button",
+      type: "submit",
       className: "user-profile__avatar-button",
       ariaLabel: "Изменить аватар",
       UserAvatar,

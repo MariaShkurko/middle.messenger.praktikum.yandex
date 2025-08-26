@@ -5,16 +5,18 @@ const METHODS = {
   DELETE: "DELETE",
 } as const;
 
-type HTTPMethod = keyof typeof METHODS;
+type TMethod = keyof typeof METHODS;
 
 type Headers = Record<string, string>;
 
 interface RequestOptions {
-  method?: HTTPMethod;
+  method?: TMethod;
   headers?: Headers;
   data?: Record<string, unknown> | null;
   timeout?: number;
 }
+
+type HTTPMethod = <R = unknown>(url: string, options?: Partial<RequestOptions>) => Promise<R>;
 
 function queryStringify(data: Record<string, unknown>): string {
   const keys = Object.keys(data);
@@ -27,28 +29,20 @@ function queryStringify(data: Record<string, unknown>): string {
 }
 
 class HTTP {
-  get = (url: string, options: RequestOptions = {}) => {
-    return this.request(url, { ...options, method: METHODS.GET }, options.timeout);
-  };
+  private createMethod(method: TMethod): HTTPMethod {
+    return (url, options = {}) => this.request(url, { ...options, method });
+  }
 
-  post = (url: string, options: RequestOptions = {}) => {
-    return this.request(url, { ...options, method: METHODS.POST }, options.timeout);
-  };
+  protected readonly get = this.createMethod(METHODS.GET);
 
-  put = (url: string, options: RequestOptions = {}) => {
-    return this.request(url, { ...options, method: METHODS.PUT }, options.timeout);
-  };
+  protected readonly put = this.createMethod(METHODS.PUT);
 
-  delete = (url: string, options: RequestOptions = {}) => {
-    return this.request(url, { ...options, method: METHODS.DELETE }, options.timeout);
-  };
+  protected readonly post = this.createMethod(METHODS.POST);
 
-  request = (
-    url: string,
-    options: RequestOptions,
-    timeout: number = 5000,
-  ): Promise<XMLHttpRequest> => {
-    const { method, data, headers = {} } = options;
+  protected readonly delete = this.createMethod(METHODS.DELETE);
+
+  private request<R>(url: string, options: RequestOptions): Promise<R> {
+    const { method, data, headers = {}, timeout = 5000 } = options;
 
     return new Promise((resolve, reject) => {
       if (!method) {
@@ -66,7 +60,9 @@ class HTTP {
         xhr.setRequestHeader(key, value);
       });
 
-      xhr.onload = () => resolve(xhr);
+      xhr.onload = () => {
+        resolve(xhr.response as unknown as R);
+      };
       xhr.onerror = () => reject(new Error("Network Error"));
       xhr.ontimeout = () => reject(new Error("Request timed out"));
 
@@ -77,7 +73,7 @@ class HTTP {
         xhr.send(JSON.stringify(data));
       }
     });
-  };
+  }
 }
 
 export default HTTP;
