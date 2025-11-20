@@ -29,6 +29,8 @@ function queryStringify(data: Record<string, unknown>): string {
 }
 
 class HTTP {
+  constructor(baseUrl: string) {}
+
   private createMethod(method: TMethod): HTTPMethod {
     return (url, options = {}) => this.request(url, { ...options, method });
   }
