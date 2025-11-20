@@ -1,9 +1,11 @@
-import { Avatar, Button, Input, Modal } from "../../components";
-import Block, { type Props } from "../../core/Block";
 import arrowIcon from "../../assets/arrow-icon.svg?raw";
-import { validateInput } from "../../utils/validateForm";
+import { Avatar, Button, Input, Modal } from "../../components";
 import { INPUT_NAME } from "../../constants/INPUT_NAME";
+import { ROUTES } from "../../constants/ROUTES";
+import Block, { type Props } from "../../core/Block";
+import Router from "../../core/router";
 import { userMockData } from "../../mockData";
+import { validateInput } from "../../utils/validateForm";
 import UserAvatarButton from "./userAvatarButton";
 
 type TUserProfileFormData = {
@@ -19,6 +21,8 @@ type TUserProfilePageProps = Props & {
   errors: TUserProfileFormData;
   isEdit: boolean;
 };
+
+const router = Router.getInstance("#app");
 
 export default class UserProfilePage extends Block<TUserProfilePageProps> {
   static FIELDS = {
@@ -89,12 +93,10 @@ export default class UserProfilePage extends Block<TUserProfilePageProps> {
 
     const BackButton = new Button({
       variant: "icon",
-      page: "chats",
       icon: arrowIcon,
       onClick: (e: Event) => {
         e.preventDefault();
-        // eslint-disable-next-line no-console
-        console.log("navigate to chats");
+        router.go(ROUTES.MESSENGER);
       },
     });
     const EditProfileButton = new Button({
@@ -109,23 +111,19 @@ export default class UserProfilePage extends Block<TUserProfilePageProps> {
     const EditPasswordButton = new Button({
       label: "Изменить пароль",
       variant: "link",
-      page: "edit-password",
       type: "button",
       onClick: (e) => {
         e.preventDefault();
-        // eslint-disable-next-line no-console
-        console.log("navigate to edit password");
+        router.go(ROUTES.EDIT_PASSWORD);
       },
     });
     const ExitButton = new Button({
       label: "Выйти",
       variant: "link",
-      page: "login",
       type: "button",
       onClick: (e) => {
         e.preventDefault();
-        // eslint-disable-next-line no-console
-        console.log("navigate to login");
+        router.go(ROUTES.SIGN_IN);
       },
     });
     const SubmitButton = new Button({

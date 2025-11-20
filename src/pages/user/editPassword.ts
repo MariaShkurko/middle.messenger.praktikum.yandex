@@ -1,7 +1,9 @@
 import arrowIcon from "../../assets/arrow-icon.svg?raw";
 import { Avatar, Button, Input } from "../../components";
 import { INPUT_NAME } from "../../constants/INPUT_NAME";
+import { ROUTES } from "../../constants/ROUTES";
 import Block, { type Props } from "../../core/Block";
+import Router from "../../core/router";
 import { userMockData } from "../../mockData";
 import { validateInput } from "../../utils/validateForm";
 
@@ -14,6 +16,8 @@ type TEditPasswordPageProps = Props & {
   formState: TEditPasswordFormData;
   errors: TEditPasswordFormData;
 };
+
+const router = Router.getInstance("#app");
 
 export default class EditPasswordPage extends Block<TEditPasswordPageProps> {
   static FIELDS = {
@@ -71,24 +75,22 @@ export default class EditPasswordPage extends Block<TEditPasswordPageProps> {
 
     const BackButton = new Button({
       variant: "icon",
-      page: "chats",
       icon: arrowIcon,
       onClick: (e: Event) => {
         e.preventDefault();
-        // eslint-disable-next-line no-console
-        console.log("navigate to chats");
+        router.go(ROUTES.MESSENGER);
       },
     });
     const SubmitButton = new Button({
       label: "Сохранить",
       variant: "primary",
-      page: "user-profile",
       type: "submit",
       onClick: (e) => {
         e.preventDefault();
         if (allValidateInput()) {
           // eslint-disable-next-line no-console
           console.log(this.props.formState);
+          router.go(ROUTES.SETTINGS);
         }
       },
     });

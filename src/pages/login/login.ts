@@ -1,7 +1,8 @@
 import { Button, Input } from "../../components";
 import { INPUT_NAME } from "../../constants/INPUT_NAME";
+import { ROUTES } from "../../constants/ROUTES";
 import Block, { type Props } from "../../core/Block";
-import { go } from "../../core/router";
+import Router from "../../core/router";
 import { validateInput } from "../../utils/validateForm";
 
 type TLoginFormData = {
@@ -12,6 +13,8 @@ type TLoginPageProps = Props & {
   formState: TLoginFormData;
   errors: TLoginFormData;
 };
+
+const router = Router.getInstance("#app");
 
 export default class LoginPage extends Block<TLoginPageProps> {
   constructor() {
@@ -100,19 +103,17 @@ export default class LoginPage extends Block<TLoginPageProps> {
         if (allValidateInput()) {
           // eslint-disable-next-line no-console
           console.log(this.props.formState);
-          go("chats");
+          router.go(ROUTES.MESSENGER);
         }
       },
     });
     const SignUpButton = new Button({
       label: "Нет аккаунта?",
       variant: "link",
-      page: "registration",
       type: "button",
       onClick: (e) => {
         e.preventDefault();
-        // eslint-disable-next-line no-console
-        console.log("navigate to registration");
+        router.go(ROUTES.SIGN_UP);
       },
     });
 

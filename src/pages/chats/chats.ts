@@ -1,12 +1,16 @@
-import { Button, ChatItem, Dialog, Input } from "../../components";
-import Block, { type Props } from "../../core/Block";
 import searchIcon from "../../assets/search-icon.svg?raw";
+import { Button, ChatItem, Dialog, Input } from "../../components";
+import { ROUTES } from "../../constants/ROUTES";
+import Block, { type Props } from "../../core/Block";
+import Router from "../../core/router";
 import { chats as chatsMockData, messages } from "../../mockData";
 
 type TChatsPageProps = Props & {
   searchValue: string;
   selectedChatId: string | null;
 };
+
+const router = Router.getInstance("#app");
 
 export default class ChatsPage extends Block<TChatsPageProps> {
   constructor() {
@@ -16,12 +20,10 @@ export default class ChatsPage extends Block<TChatsPageProps> {
     const ButtonProfile = new Button({
       label: "Профиль",
       variant: "link",
-      page: "user-profile",
       className: "chats__button-link",
       onClick: (e) => {
         e.preventDefault();
-        // eslint-disable-next-line no-console
-        console.log("navigate to user-profile");
+        router.go(ROUTES.SETTINGS);
       },
     });
     const InputSearch = new Input({
