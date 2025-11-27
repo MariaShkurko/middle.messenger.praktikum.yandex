@@ -4,7 +4,9 @@ import { INPUT_NAME } from "../../constants/INPUT_NAME";
 import { ROUTES } from "../../constants/ROUTES";
 import Block, { type Props } from "../../core/Block";
 import Router from "../../core/router";
-import { userMockData } from "../../mockData";
+import type { IErrorResponse } from "../../models/IErrorResponse";
+import { UserController } from "../../store/UserController";
+import { connect } from "../../utils/connect";
 import { validateInput } from "../../utils/validateForm";
 
 type TEditPasswordFormData = {
@@ -15,18 +17,23 @@ type TEditPasswordFormData = {
 type TEditPasswordPageProps = Props & {
   formState: TEditPasswordFormData;
   errors: TEditPasswordFormData;
+  error: IErrorResponse;
 };
 
 const router = Router.getInstance("#app");
+const controllerUser = new UserController();
 
-export default class EditPasswordPage extends Block<TEditPasswordPageProps> {
+class EditPasswordPage extends Block<TEditPasswordPageProps> {
   static FIELDS = {
     [INPUT_NAME.OLD_PASSWORD]: "InputOldPassword",
     [INPUT_NAME.NEW_PASSWORD]: "InputNewPassword",
     [INPUT_NAME.AGAIN_NEW_PASSWORD]: "InputAgainNewPassword",
   };
 
-  constructor() {
+  constructor(
+    tagName: string = "div",
+    props: TEditPasswordPageProps = {} as TEditPasswordPageProps,
+  ) {
     const formState = {
       oldPassword: "",
       newPassword: "",
@@ -88,16 +95,22 @@ export default class EditPasswordPage extends Block<TEditPasswordPageProps> {
       onClick: (e) => {
         e.preventDefault();
         if (allValidateInput()) {
-          // eslint-disable-next-line no-console
-          console.log(this.props.formState);
-          router.go(ROUTES.SETTINGS);
+          void (async () => {
+            try {
+              await controllerUser.updatePassword(this.props.formState).then(() => {
+                router.go(ROUTES.SETTINGS);
+              });
+            } catch (error) {
+              console.error("Ошибка сохранения:", error);
+            }
+          })();
         }
       },
     });
     const UserAvatar = new Avatar({
       width: "130px",
       height: "130px",
-      avatarUrl: userMockData.avatarUrl,
+      avatarUrl: "",
     });
     const InputOldPassword = new Input({
       id: INPUT_NAME.OLD_PASSWORD,
@@ -148,10 +161,10 @@ export default class EditPasswordPage extends Block<TEditPasswordPageProps> {
       },
     });
 
-    super("div", {
+    super(tagName ?? "div", {
+      ...props,
       formState,
       errors,
-      user: userMockData,
       className: "user-profile",
       BackButton,
       UserAvatar,
@@ -190,11 +203,15 @@ export default class EditPasswordPage extends Block<TEditPasswordPageProps> {
         }
       }
     });
+    if (_oldProps.error !== _newProps.error) {
+      return true;
+    }
 
     return false;
   }
 
   render() {
+    const errorMessage = this.props.error ? JSON.stringify(this.props.error) : "";
     return `
       <div class="user-profile__back-button">
         {{{ BackButton }}}
@@ -205,6 +222,7 @@ export default class EditPasswordPage extends Block<TEditPasswordPageProps> {
             {{{ UserAvatar }}}
             <p>{{user.display_name}}</p>
           </div>
+          <div>${errorMessage}</div>
           <div class="user-profile__detailed-info">
             <div class="user-profile__line">
               <span>Старый пароль</span>
@@ -227,3 +245,9 @@ export default class EditPasswordPage extends Block<TEditPasswordPageProps> {
     `;
   }
 }
+
+const ConnectedEditPasswordPage = connect<TEditPasswordPageProps>(EditPasswordPage, (state) => ({
+  error: state.error as IErrorResponse,
+}));
+
+export default ConnectedEditPasswordPage;

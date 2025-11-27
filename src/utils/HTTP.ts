@@ -1,22 +1,34 @@
+import type { IErrorResponse } from "../models/IErrorResponse";
+
 const METHODS = {
   GET: "GET",
   POST: "POST",
   PUT: "PUT",
   DELETE: "DELETE",
 } as const;
+const HOST = "https://ya-praktikum.tech";
 
 type TMethod = keyof typeof METHODS;
 
 type Headers = Record<string, string>;
 
-interface RequestOptions {
+interface RequestOptions<D> {
   method?: TMethod;
   headers?: Headers;
-  data?: Record<string, unknown> | null;
+  data?: D;
   timeout?: number;
 }
 
-type HTTPMethod = <R = unknown>(url: string, options?: Partial<RequestOptions>) => Promise<R>;
+interface Response<R> {
+  success: boolean;
+  data?: R;
+  error?: IErrorResponse;
+}
+
+type HTTPMethod = <D = unknown, R = unknown>(
+  url: string,
+  options?: Partial<RequestOptions<D>>,
+) => Promise<Response<R>>;
 
 function queryStringify(data: Record<string, unknown>): string {
   const keys = Object.keys(data);
@@ -29,21 +41,26 @@ function queryStringify(data: Record<string, unknown>): string {
 }
 
 class HTTP {
-  constructor(baseUrl: string) {}
+  private baseUrl: string;
 
-  private createMethod(method: TMethod): HTTPMethod {
-    return (url, options = {}) => this.request(url, { ...options, method });
+  constructor(baseUrl: string) {
+    this.baseUrl = baseUrl;
   }
 
-  protected readonly get = this.createMethod(METHODS.GET);
+  private createMethod(method: TMethod): HTTPMethod {
+    return (url, options = {}) =>
+      this.request(url, {
+        ...options,
+        method,
+      });
+  }
 
-  protected readonly put = this.createMethod(METHODS.PUT);
+  public readonly get = this.createMethod(METHODS.GET);
+  public readonly put = this.createMethod(METHODS.PUT);
+  public readonly post = this.createMethod(METHODS.POST);
+  public readonly delete = this.createMethod(METHODS.DELETE);
 
-  protected readonly post = this.createMethod(METHODS.POST);
-
-  protected readonly delete = this.createMethod(METHODS.DELETE);
-
-  private request<R>(url: string, options: RequestOptions): Promise<R> {
+  private request<D, R>(url: string, options: RequestOptions<D>): Promise<Response<R>> {
     const { method, data, headers = {}, timeout = 5000 } = options;
 
     return new Promise((resolve, reject) => {
@@ -54,24 +71,78 @@ class HTTP {
 
       const xhr = new XMLHttpRequest();
       const isGet = method === METHODS.GET;
-      xhr.open(method, isGet && !!data ? `${url}${queryStringify(data)}` : url);
+      xhr.open(
+        method,
+        isGet && !!data
+          ? `${HOST}${this.baseUrl}${url}${queryStringify(data)}`
+          : `${HOST}${this.baseUrl}${url}`,
+      );
 
+      xhr.withCredentials = true;
       xhr.timeout = timeout;
 
+      xhr.setRequestHeader("Accept", "application/json");
+      xhr.setRequestHeader("Content-Type", "application/json");
       Object.entries(headers).forEach(([key, value]) => {
         xhr.setRequestHeader(key, value);
       });
 
       xhr.onload = () => {
-        resolve(xhr.response as unknown as R);
+        const status = xhr.status;
+        let responseData: R;
+
+        try {
+          responseData = JSON.parse(xhr.responseText) as R;
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        } catch (e) {
+          responseData = xhr.responseText as unknown as R;
+        }
+
+        if (status >= 200 && status < 300) {
+          resolve({
+            success: true,
+            data: responseData,
+          });
+        } else {
+          const errorResponse = JSON.parse(xhr.responseText) as {
+            reason: string;
+            details?: string;
+          };
+          resolve({
+            success: false,
+            error: {
+              status: status,
+              message: errorResponse.reason || xhr.statusText,
+              details: errorResponse?.details || null,
+            },
+          });
+        }
       };
-      xhr.onerror = () => reject(new Error("Network Error"));
-      xhr.ontimeout = () => reject(new Error("Request timed out"));
+      xhr.onerror = () => {
+        resolve({
+          success: false,
+          error: {
+            status: 500,
+            message: "Network Error",
+            details: "Не удалось установить соединение с сервером",
+          },
+        });
+      };
+
+      xhr.ontimeout = () => {
+        resolve({
+          success: false,
+          error: {
+            status: 504,
+            message: "Request timed out",
+            details: `Запрос занял больше ${timeout} мс`,
+          },
+        });
+      };
 
       if (isGet || !data) {
         xhr.send();
       } else {
-        xhr.setRequestHeader("Content-Type", "application/json");
         xhr.send(JSON.stringify(data));
       }
     });

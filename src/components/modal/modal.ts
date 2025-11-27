@@ -1,15 +1,22 @@
 import Block, { type Props } from "../../core/Block";
+import Overlay from "./overlay";
 
 type TModalProps = Props & {
   active: boolean;
-  children: string;
+  content: Block;
 };
 
 export default class Modal extends Block<TModalProps> {
   constructor(props: TModalProps) {
+    const OverlayComponent = new Overlay({
+      onClick: () => {
+        this.setProps({ active: false });
+      },
+    });
     super("div", {
       ...props,
       className: "modal",
+      OverlayComponent,
     });
   }
 
@@ -27,9 +34,9 @@ export default class Modal extends Block<TModalProps> {
 
   protected render(): string {
     return `
-      <div class="modal__overlay"></div>
+      {{{ OverlayComponent }}}
       <div class="modal__content">
-        {{{ children }}}
+        {{{ content }}}
       </div>
     `;
   }

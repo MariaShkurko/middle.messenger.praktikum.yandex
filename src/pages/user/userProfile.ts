@@ -4,27 +4,36 @@ import { INPUT_NAME } from "../../constants/INPUT_NAME";
 import { ROUTES } from "../../constants/ROUTES";
 import Block, { type Props } from "../../core/Block";
 import Router from "../../core/router";
-import { userMockData } from "../../mockData";
+import type { IErrorResponse } from "../../models/IErrorResponse";
+import type { IUser } from "../../models/IUser";
+import { AuthController } from "../../store/AuthController";
+import { UserController } from "../../store/UserController";
+import { connect } from "../../utils/connect";
 import { validateInput } from "../../utils/validateForm";
 import UserAvatarButton from "./userAvatarButton";
+import { UserAvatarForm } from "./UserAvatarForm";
 
 type TUserProfileFormData = {
   email: string;
   login: string;
-  firstName: string;
-  secondName: string;
-  displayName: string;
+  first_name: string;
+  second_name: string;
+  display_name: string;
   phone: string;
 };
 type TUserProfilePageProps = Props & {
   formState: TUserProfileFormData;
   errors: TUserProfileFormData;
+  userInfo: IUser;
   isEdit: boolean;
+  error: IErrorResponse;
 };
 
 const router = Router.getInstance("#app");
+const controllerAuth = new AuthController();
+const controllerUser = new UserController();
 
-export default class UserProfilePage extends Block<TUserProfilePageProps> {
+class UserProfilePage extends Block<TUserProfilePageProps> {
   static FIELDS = {
     [INPUT_NAME.EMAIL]: "InputEmail",
     [INPUT_NAME.LOGIN]: "InputLogin",
@@ -34,21 +43,21 @@ export default class UserProfilePage extends Block<TUserProfilePageProps> {
     [INPUT_NAME.PHONE]: "InputPhone",
   };
 
-  constructor() {
+  constructor(tagName: string = "div", props: TUserProfilePageProps = {} as TUserProfilePageProps) {
     const formState = {
-      email: userMockData.email,
-      login: userMockData.login,
-      firstName: userMockData.first_name,
-      secondName: userMockData.second_name,
-      displayName: userMockData.display_name,
-      phone: userMockData.phone,
+      email: "",
+      login: "",
+      first_name: "",
+      second_name: "",
+      display_name: "",
+      phone: "",
     };
     const errors = {
       email: "",
       login: "",
-      firstName: "",
-      secondName: "",
-      displayName: "",
+      first_name: "",
+      second_name: "",
+      display_name: "",
       phone: "",
     };
     const isEdit = false;
@@ -123,7 +132,15 @@ export default class UserProfilePage extends Block<TUserProfilePageProps> {
       type: "button",
       onClick: (e) => {
         e.preventDefault();
-        router.go(ROUTES.SIGN_IN);
+        void (async () => {
+          try {
+            await controllerAuth.logOut().then(() => {
+              router.go(ROUTES.SIGN_IN);
+            });
+          } catch (error) {
+            console.error("Ошибка выхода:", error);
+          }
+        })();
       },
     });
     const SubmitButton = new Button({
@@ -133,16 +150,22 @@ export default class UserProfilePage extends Block<TUserProfilePageProps> {
       onClick: (e) => {
         e.preventDefault();
         if (allValidateInput()) {
-          // eslint-disable-next-line no-console
-          console.log(this.props.formState);
-          onChangeIsEdit(false);
+          void (async () => {
+            try {
+              await controllerUser.updateProfile(this.props.formState).then(() => {
+                onChangeIsEdit(false);
+              });
+            } catch (error) {
+              console.error("Ошибка сохранения:", error);
+            }
+          })();
         }
       },
     });
     const UserAvatar = new Avatar({
       width: "130px",
       height: "130px",
-      avatarUrl: userMockData.avatarUrl,
+      avatarUrl: "",
     });
     const UserAvatarBtn = new UserAvatarButton(UserAvatar, (e) => {
       e.preventDefault();
@@ -189,8 +212,8 @@ export default class UserProfilePage extends Block<TUserProfilePageProps> {
       formId: "user-profile-form",
       type: "text",
       variant: "line",
-      value: formState.firstName,
-      errorMessage: errors.firstName,
+      value: formState.first_name,
+      errorMessage: errors.first_name,
       disabled: !isEdit,
       onChange: (e) => {
         const target = e.target as HTMLInputElement;
@@ -206,8 +229,8 @@ export default class UserProfilePage extends Block<TUserProfilePageProps> {
       formId: "user-profile-form",
       type: "text",
       variant: "line",
-      value: formState.secondName,
-      errorMessage: errors.secondName,
+      value: formState.second_name,
+      errorMessage: errors.second_name,
       disabled: !isEdit,
       onChange: (e) => {
         const target = e.target as HTMLInputElement;
@@ -223,8 +246,8 @@ export default class UserProfilePage extends Block<TUserProfilePageProps> {
       formId: "user-profile-form",
       type: "text",
       variant: "line",
-      value: formState.displayName,
-      errorMessage: errors.displayName,
+      value: formState.display_name,
+      errorMessage: errors.display_name,
       disabled: !isEdit,
       onChange: (e) => {
         const target = e.target as HTMLInputElement;
@@ -258,36 +281,34 @@ export default class UserProfilePage extends Block<TUserProfilePageProps> {
       className: "avatar-modal__submit",
       onClick: (e) => {
         e.preventDefault();
-        const form = document.getElementById("user-avatar-form") as HTMLFormElement;
-        const formData = new FormData(form);
-        // eslint-disable-next-line no-console
-        console.log("upload avatar", formData.get("avatar"));
-        if (!Array.isArray(this.children.ModalChangeAvatar)) {
-          this.children.ModalChangeAvatar.setProps({ active: false });
-        }
+        void (async () => {
+          try {
+            const form = document.getElementById("user-avatar-form") as HTMLFormElement;
+            const formData = new FormData(form);
+            await controllerUser.updateAvatar(formData).then(async () => {
+              await controllerAuth.getAuthUserInfo();
+              if (!Array.isArray(this.children.ModalChangeAvatar)) {
+                this.children.ModalChangeAvatar.setProps({ active: false });
+              }
+            });
+          } catch (error) {
+            console.error("Ошибка сохранения:", error);
+          }
+        })();
       },
     });
+    const UserAvatarFormComponent = new UserAvatarForm({ SubmitAvatarButton });
     const ModalChangeAvatar = new Modal({
       id: "change-avatar-modal",
       active: false,
-      children: `
-        <form id="user-avatar-form">
-          <p class="modal__title">Загрузите файл</p>
-          <label class="avatar-modal__file-label">
-            <input type="file" name="avatar" accept="image/*" class="avatar-modal__file-input" />
-            <span class="avatar-modal__file-text">Выбрать файл на компьютере</span>
-          </label>
-          {{{ SubmitAvatarButton }}}
-        </form>
-      `,
-      SubmitAvatarButton,
+      content: UserAvatarFormComponent,
     });
 
-    super("div", {
+    super(tagName ?? "div", {
+      ...props,
       formState,
       errors,
       isEdit,
-      user: userMockData,
       className: "user-profile",
       BackButton,
       UserAvatar,
@@ -346,11 +367,19 @@ export default class UserProfilePage extends Block<TUserProfilePageProps> {
       });
       return true;
     }
+    if (_oldProps.userInfo !== _newProps.userInfo) {
+      this.setProps({ formState: _newProps.userInfo });
+      return true;
+    }
+    if (_oldProps.error !== _newProps.error) {
+      return true;
+    }
 
     return false;
   }
 
   render() {
+    const errorMessage = this.props.error ? JSON.stringify(this.props.error) : "";
     const ControlsBlock = this.props.isEdit
       ? `
         <div class="user-profile__controls user-profile__controls--edit">
@@ -375,6 +404,7 @@ export default class UserProfilePage extends Block<TUserProfilePageProps> {
       <div class="user-profile__back-button">
         {{{ BackButton }}}
       </div>
+      <div>${errorMessage}</div>
       <div class="user-profile__main">
         <form id="user-profile-form">
 
@@ -417,3 +447,10 @@ export default class UserProfilePage extends Block<TUserProfilePageProps> {
     `;
   }
 }
+
+const ConnectedUserProfilePage = connect<TUserProfilePageProps>(UserProfilePage, (state) => ({
+  error: state.error as IErrorResponse,
+  userInfo: state.authUserInfo as IUser,
+}));
+
+export default ConnectedUserProfilePage;

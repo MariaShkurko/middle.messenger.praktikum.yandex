@@ -1,10 +1,16 @@
 import Route from "./Route";
 import Block, { type Props } from "./Block";
+import { ROUTES } from "../constants/ROUTES";
+
+interface RouteInfo<TProps extends Props> {
+  route: Route<TProps>;
+  guard?: () => boolean;
+}
 
 export default class Router {
   private static __instance: Router | null = null;
 
-  private routes: Route<Props>[] = [];
+  private routes: RouteInfo<Props>[] = [];
   private _currentRoute: Route<Props> | null = null;
   private readonly rootQuery: string;
 
@@ -21,11 +27,13 @@ export default class Router {
 
   public use<TProps extends Props>(
     pathname: string,
-    block: new (props?: TProps) => Block<TProps>,
+    block: new (tagName?: string, props?: TProps) => Block<TProps>,
     props: TProps = {} as TProps,
+    tagName: string = "div",
+    guard?: () => boolean,
   ): this {
-    const route = new Route<TProps>(pathname, block, props);
-    this.routes.push(route as unknown as Route<Props>);
+    const route = new Route<TProps>(pathname, block, props, tagName);
+    this.routes.push({ route: route as unknown as Route<Props>, guard });
     return this;
   }
 
@@ -35,8 +43,17 @@ export default class Router {
   }
 
   private _onRoute(pathname: string) {
-    const route = this.getRoute(pathname);
-    if (!route) return;
+    const routeInfo = this.getRouteInfo(pathname);
+    if (!routeInfo) return;
+
+    const { route, guard } = routeInfo;
+
+    if (guard && !guard()) {
+      if (pathname !== ROUTES.SIGN_IN) {
+        this.go(ROUTES.SIGN_IN);
+      }
+      return;
+    }
 
     if (this._currentRoute) {
       this._currentRoute.leave();
@@ -59,7 +76,11 @@ export default class Router {
     window.history.forward();
   }
 
-  private getRoute(pathname: string): Route<Props> | undefined {
-    return this.routes.find((route) => route.match(pathname));
+  private getRouteInfo(pathname: string): RouteInfo<Props> | undefined {
+    return this.routes.find((info) => info.route.match(pathname));
+  }
+
+  public isInitialized(): boolean {
+    return this._currentRoute !== null;
   }
 }

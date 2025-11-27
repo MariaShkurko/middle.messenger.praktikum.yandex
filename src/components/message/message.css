@@ -1,6 +1,7 @@
 .message {
   position: relative;
   max-width: 500px;
+  min-width: 25%;
   width: auto;
   padding: 11px;
   margin-bottom: 10px;

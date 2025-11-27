@@ -6,3 +6,4 @@ export { Dialog } from "./dialog";
 export { Modal } from "./modal";
 export { MenuButton } from "./menuButton";
 export { Message } from "./message";
+export { UserList } from "./userList";

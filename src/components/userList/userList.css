@@ -1,0 +1,17 @@
+.user-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 20px;
+
+  &__item {
+    width: 100%;
+    color: var(--text-primary-color);
+    font-size: 12px;
+    cursor: pointer;
+  }
+
+  &__item--selected {
+    color: var(--primary-color);
+  }
+}

@@ -1,14 +1,16 @@
 import Block, { type Props } from "../../core/Block";
-import type { TChatListDataItem, TMessage } from "../../types";
+import type { IChat, IMessage } from "../../models/IChat";
+import { connect } from "../../utils/connect";
 import { Avatar } from "../avatar";
 
 type TChatItemProps = Props &
-  TChatListDataItem & {
-    selected: boolean;
+  IChat & {
+    selectedChatId: number | null;
+    authUserId: number;
   };
 
-export default class ChatItem extends Block<TChatItemProps> {
-  constructor(props: TChatItemProps) {
+class ChatItem extends Block<TChatItemProps> {
+  constructor(tagName: string = "div", props: TChatItemProps) {
     const formatDate = (inputDate: Date | string) => {
       const today = new Date();
       const input = new Date(inputDate);
@@ -45,41 +47,39 @@ export default class ChatItem extends Block<TChatItemProps> {
 
       return `${day}.${month}.${year}`;
     };
-    const getLastMessageInfo = (message: TMessage): { text: string; time: string } => {
+    const getLastMessageInfo = (message: IMessage): { text: string; time: string } => {
       const res = {
         text: "",
         time: "",
       };
 
-      if (message.imageUrl) {
-        res.text = "Изображение";
-      } else {
-        res.text =
-          message.text && message.text.length > 50
-            ? message.text.slice(0, 50) + "..."
-            : message.text || "";
-      }
+      if (!message) return res;
 
-      if (message.isOwn) {
+      res.text =
+        message.content && message.content.length > 50
+          ? message.content.slice(0, 50) + "..."
+          : message.content || "";
+
+      if (message.user.id === props.authUserId) {
         res.text = "Вы: " + res.text;
       }
 
-      if (message.dateTime) {
-        res.time = formatDate(message.dateTime);
+      if (message.time) {
+        res.time = formatDate(message.time);
       }
 
       return res;
     };
 
-    const { text: lastMessageText, time: lastMessageTime } = getLastMessageInfo(props.lastMessage);
-    super("div", {
+    const { text: lastMessageText, time: lastMessageTime } = getLastMessageInfo(props.last_message);
+    super(tagName, {
       ...props,
       className: "chat-item",
       lastMessageText,
       lastMessageTime,
       ContactAvatar: new Avatar({
         className: "chat-item__avatar",
-        avatarUrl: props?.contact?.avatarUrl,
+        avatarUrl: props?.avatar,
         width: "47px",
         height: "47px",
       }),
@@ -87,8 +87,8 @@ export default class ChatItem extends Block<TChatItemProps> {
   }
 
   protected componentDidUpdate(_oldProps: TChatItemProps, _newProps: TChatItemProps): boolean {
-    if (_oldProps.selected !== _newProps.selected) {
-      if (_newProps.selected) {
+    if (_oldProps.selectedChatId !== _newProps.selectedChatId) {
+      if (_newProps.selectedChatId === _newProps.id) {
         this.addClassName("chat-item--selected");
       } else {
         this.removeClassName("chat-item--selected");
@@ -99,14 +99,14 @@ export default class ChatItem extends Block<TChatItemProps> {
   }
 
   protected render(): string {
-    const unreadCountBage = this.props.unreadCount
-      ? `<div class="chat-item__badge">{{unreadCount}}</div>`
-      : `<div class="chat-item__badge chat-item__badge--empty">{{unreadCount}}</div>`;
+    const unreadCountBage = this.props.unread_count
+      ? `<div class="chat-item__badge">{{unread_count}}</div>`
+      : `<div class="chat-item__badge chat-item__badge--empty">{{unread_count}}</div>`;
 
     return `
       {{{ ContactAvatar }}}
       <div class="chat-item__info">
-        <span class="chat-item__name">{{contact.name}}</span>
+        <span class="chat-item__name">{{title}}</span>
         <span class="chat-item__last">{{lastMessageText}}</span>
       </div>
       <div class="chat-item__meta-info">
@@ -116,3 +116,11 @@ export default class ChatItem extends Block<TChatItemProps> {
     `;
   }
 }
+
+const ConnectedChatItemPage = connect<TChatItemProps>(ChatItem, (state) => {
+  return {
+    selectedChatId: state.selectedChatId as number,
+  };
+});
+
+export default ConnectedChatItemPage;

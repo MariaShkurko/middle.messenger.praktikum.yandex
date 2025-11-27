@@ -3,6 +3,9 @@ import { INPUT_NAME } from "../../constants/INPUT_NAME";
 import { ROUTES } from "../../constants/ROUTES";
 import Block, { type Props } from "../../core/Block";
 import Router from "../../core/router";
+import type { IErrorResponse } from "../../models/IErrorResponse";
+import { AuthController } from "../../store/AuthController";
+import { connect } from "../../utils/connect";
 import { validateInput } from "../../utils/validateForm";
 
 type TLoginFormData = {
@@ -15,9 +18,10 @@ type TLoginPageProps = Props & {
 };
 
 const router = Router.getInstance("#app");
+const controller = new AuthController();
 
-export default class LoginPage extends Block<TLoginPageProps> {
-  constructor() {
+class LoginPage extends Block<TLoginPageProps> {
+  constructor(tagName: string = "div", props: TLoginPageProps = {} as TLoginPageProps) {
     const formState = {
       login: "",
       password: "",
@@ -101,9 +105,15 @@ export default class LoginPage extends Block<TLoginPageProps> {
       onClick: (e) => {
         e.preventDefault();
         if (allValidateInput()) {
-          // eslint-disable-next-line no-console
-          console.log(this.props.formState);
-          router.go(ROUTES.MESSENGER);
+          void (async () => {
+            try {
+              await controller.signIn(this.props.formState).then(() => {
+                router.go(ROUTES.MESSENGER);
+              });
+            } catch (error) {
+              console.error("Ошибка входа:", error);
+            }
+          })();
         }
       },
     });
@@ -117,15 +127,19 @@ export default class LoginPage extends Block<TLoginPageProps> {
       },
     });
 
-    super("div", {
-      formState,
-      errors,
+    const combinedProps: TLoginPageProps = {
+      ...props,
+      formState: { ...formState, ...props?.formState },
+      errors: { ...errors, ...props?.errors },
       className: "login",
+      error: props?.error ?? null,
       InputLogin,
       InputPassword,
-      SignInButton,
       SignUpButton,
-    });
+      SignInButton,
+    };
+
+    super(tagName ?? "div", combinedProps);
   }
 
   protected componentDidUpdate(_oldProps: TLoginPageProps, _newProps: TLoginPageProps): boolean {
@@ -161,3 +175,9 @@ export default class LoginPage extends Block<TLoginPageProps> {
     `;
   }
 }
+
+const ConnectedLoginPage = connect<TLoginPageProps>(LoginPage, (state) => ({
+  error: state.error as IErrorResponse,
+}));
+
+export default ConnectedLoginPage;
