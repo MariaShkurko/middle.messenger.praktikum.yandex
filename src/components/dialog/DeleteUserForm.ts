@@ -1,4 +1,4 @@
-import { Button, UserList } from "..";
+import { Button } from "..";
 import type { Props } from "../../core/Block";
 import Block from "../../core/Block";
 import type { IErrorResponse } from "../../models/IErrorResponse";
@@ -7,6 +7,7 @@ import { ChatController } from "../../store/ChatController";
 import store from "../../store/Store";
 import { connect } from "../../utils/connect";
 import isEqual from "../../utils/isEqual";
+import ChatUserList from "./chatUserList";
 
 type TDeleteUserFormProps = Props & {
   error: IErrorResponse | null;
@@ -20,13 +21,13 @@ const controller = new ChatController();
 
 class DeleteUserForm extends Block<TDeleteUserFormProps> {
   constructor(tagName: string = "form", props: TDeleteUserFormProps) {
-    const UserListComponent = new UserList("div", {
+    const UserListComponent = new ChatUserList("div", {
       userList: null,
       selectedUser: props.selectedUser ?? null,
       onSelectUser: (selectedUser) => {
         const userInfo = this.props.userList?.find(({ id }) => id === selectedUser.id);
         if (userInfo?.role === "admin") {
-          store.set("error", "Нельзя удалить администратора");
+          store.set("error", { message: "Нельзя удалить администратора" });
         } else {
           this.setProps({ selectedUser });
         }
@@ -55,6 +56,9 @@ class DeleteUserForm extends Block<TDeleteUserFormProps> {
                   this.props.onCloseModal();
                   this.setProps({ selectedUser: null });
                   await controller.getChats({});
+                  await controller.getUsersInChat({
+                    chatId: this.props.selectedChatId as number,
+                  });
                 });
             } catch (error) {
               console.error("Ошибка добавления пользователя:", error);
@@ -111,9 +115,8 @@ class DeleteUserForm extends Block<TDeleteUserFormProps> {
   }
 
   protected render(): string {
-    const errorMessage = this.props.error ? JSON.stringify(this.props.error) : "";
     return `
-      ${errorMessage}
+      ${this.props.error?.message ?? ""}
       {{{ UserListComponent }}}
       {{{ SubmitDeleteUserButton }}}
     `;

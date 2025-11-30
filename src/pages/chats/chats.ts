@@ -106,6 +106,7 @@ class ChatsPage extends Block<TChatsPageProps> {
 
   protected componentDidMount() {
     void this.loadChats();
+    this.createChatItems();
     setInterval(() => {
       void this.loadChats();
     }, 30000);

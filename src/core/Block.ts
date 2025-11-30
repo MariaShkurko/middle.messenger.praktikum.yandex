@@ -156,13 +156,7 @@ abstract class Block<TProps extends Props = Props> {
 
   #componentDidMount(): void {
     this.componentDidMount();
-    Object.values(this.children).forEach((child) => {
-      if (Array.isArray(child)) {
-        child.forEach((c) => c.dispatchComponentDidMount());
-      } else {
-        child.dispatchComponentDidMount();
-      }
-    });
+    this.#eventBus.emit(BLOCK_EVENTS.FLOW_RENDER);
   }
 
   #componentDidUpdate(oldProps: TProps, newProps: TProps): void {
@@ -219,7 +213,7 @@ abstract class Block<TProps extends Props = Props> {
 
   protected init(): void {
     this.#createResources();
-    this.#eventBus.emit(BLOCK_EVENTS.FLOW_RENDER);
+    this.#eventBus.emit(BLOCK_EVENTS.FLOW_CDM);
   }
 
   protected componentDidMount(_oldProps?: TProps): void {}
@@ -261,6 +255,10 @@ abstract class Block<TProps extends Props = Props> {
 
   public getContent(): HTMLElement | null {
     return this.#element;
+  }
+
+  public addChild(name: string, child: Block<Props> | Block<Props>[]) {
+    this.children[name] = child;
   }
 }
 

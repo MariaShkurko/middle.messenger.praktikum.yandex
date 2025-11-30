@@ -70,6 +70,9 @@ class AddUserForm extends Block<TAddUserFormProps> {
                   this.props.onCloseModal();
                   this.setProps({ userLogin: "", selectedUser: null });
                   await controllerChat.getChats({});
+                  await controllerChat.getUsersInChat({
+                    chatId: this.props.selectedChatId as number,
+                  });
                 });
             } catch (error) {
               console.error("Ошибка добавления пользователя:", error);

@@ -94,7 +94,7 @@ class Dialog extends Block<TDialogProps> {
       onClick: (_e: Event) => {
         _e.preventDefault();
         this.setProps({
-          showMenu: true,
+          showMenu: !this.props.showMenu,
         });
       },
     });
@@ -105,12 +105,14 @@ class Dialog extends Block<TDialogProps> {
         if (!Array.isArray(this.children.ModalAddUser)) {
           this.children.ModalAddUser.setProps({ active: true });
         }
+        this.setProps({ showMenu: false });
       },
       onDeleteUser: (e: Event) => {
         e.preventDefault();
         if (!Array.isArray(this.children.ModalDeleteUser)) {
           this.children.ModalDeleteUser.setProps({ active: true });
         }
+        this.setProps({ showMenu: false });
       },
     });
     this.children.InputMessage = new Input({
@@ -380,7 +382,8 @@ class Dialog extends Block<TDialogProps> {
         void this.getToken();
         this.children.messageComponents = [];
       }
-      this.setProps({ showDialog: !!newProps.selectedChatId });
+      this.setProps({ showDialog: !!newProps.selectedChatId, showMenu: false });
+
       if (newProps.selectedChatId) {
         this.removeClassName("feed--empty");
       } else {
@@ -394,7 +397,10 @@ class Dialog extends Block<TDialogProps> {
         this.wsController();
       }
     }
-    if (!isEqual(oldProps.chatList, newProps.chatList)) {
+    if (
+      oldProps.selectedChatId !== newProps.selectedChatId &&
+      !isEqual(oldProps.chatList, newProps.chatList)
+    ) {
       this.chatInfo =
         newProps.chatList?.length && newProps.selectedChatId
           ? (newProps.chatList.find(({ id }) => id === newProps.selectedChatId) ?? null)
@@ -413,6 +419,14 @@ class Dialog extends Block<TDialogProps> {
       if (!Array.isArray(this.children[childrenName])) {
         this.children[childrenName].setProps({
           errorMessage: newProps.inputError,
+        });
+      }
+    }
+    if (oldProps.showMenu !== newProps.showMenu) {
+      const childrenName = "HideMenu";
+      if (!Array.isArray(this.children[childrenName])) {
+        this.children[childrenName].setProps({
+          showMenu: newProps.showMenu,
         });
       }
     }
@@ -448,6 +462,7 @@ class Dialog extends Block<TDialogProps> {
 
         {{{ ModalAddUser }}}
         {{{ ModalDeleteUser }}}
+        {{{ HideMenu }}}
       `;
     }
 
