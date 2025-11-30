@@ -5,8 +5,10 @@ import { ROUTES } from "../../constants/ROUTES";
 import Block, { type Props } from "../../core/Block";
 import Router from "../../core/router";
 import type { IErrorResponse } from "../../models/IErrorResponse";
+import type { IUser } from "../../models/IUser";
 import { UserController } from "../../store/UserController";
 import { connect } from "../../utils/connect";
+import { URL_RESOURCES } from "../../utils/HTTP";
 import { validateInput } from "../../utils/validateForm";
 
 type TEditPasswordFormData = {
@@ -17,7 +19,8 @@ type TEditPasswordFormData = {
 type TEditPasswordPageProps = Props & {
   formState: TEditPasswordFormData;
   errors: TEditPasswordFormData;
-  error: IErrorResponse;
+  error: IErrorResponse | null;
+  userInfo: IUser;
 };
 
 const router = Router.getInstance("#app");
@@ -110,7 +113,7 @@ class EditPasswordPage extends Block<TEditPasswordPageProps> {
     const UserAvatar = new Avatar({
       width: "130px",
       height: "130px",
-      avatarUrl: "",
+      avatarUrl: props.userInfo?.avatar ? `${URL_RESOURCES}${props.userInfo.avatar}` : "",
     });
     const InputOldPassword = new Input({
       id: INPUT_NAME.OLD_PASSWORD,
@@ -165,6 +168,7 @@ class EditPasswordPage extends Block<TEditPasswordPageProps> {
       ...props,
       formState,
       errors,
+      error: null,
       className: "user-profile",
       BackButton,
       UserAvatar,
@@ -248,6 +252,7 @@ class EditPasswordPage extends Block<TEditPasswordPageProps> {
 
 const ConnectedEditPasswordPage = connect<TEditPasswordPageProps>(EditPasswordPage, (state) => ({
   error: state.error as IErrorResponse,
+  userInfo: state.authUserInfo as IUser,
 }));
 
 export default ConnectedEditPasswordPage;

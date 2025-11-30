@@ -7,6 +7,7 @@ const METHODS = {
   DELETE: "DELETE",
 } as const;
 const HOST = "https://ya-praktikum.tech";
+export const URL_RESOURCES = `${HOST}/api/v2/resources`;
 
 type TMethod = keyof typeof METHODS;
 
@@ -81,8 +82,18 @@ class HTTP {
       xhr.withCredentials = true;
       xhr.timeout = timeout;
 
-      xhr.setRequestHeader("Accept", "application/json");
-      xhr.setRequestHeader("Content-Type", "application/json");
+      let contentType: string | null = null;
+
+      if (data instanceof FormData) {
+        contentType = null;
+      } else if (data !== undefined) {
+        contentType = "application/json";
+      }
+
+      if (!headers["Content-Type"] && contentType) {
+        xhr.setRequestHeader("Content-Type", contentType);
+      }
+
       Object.entries(headers).forEach(([key, value]) => {
         xhr.setRequestHeader(key, value);
       });
@@ -143,7 +154,11 @@ class HTTP {
       if (isGet || !data) {
         xhr.send();
       } else {
-        xhr.send(JSON.stringify(data));
+        if (data instanceof FormData) {
+          xhr.send(data);
+        } else {
+          xhr.send(JSON.stringify(data));
+        }
       }
     });
   }

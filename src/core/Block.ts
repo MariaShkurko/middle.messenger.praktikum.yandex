@@ -155,7 +155,7 @@ abstract class Block<TProps extends Props = Props> {
   }
 
   #componentDidMount(): void {
-    this.componentDidMount();
+    this.componentDidMount(this.props);
     this.#eventBus.emit(BLOCK_EVENTS.FLOW_RENDER);
   }
 

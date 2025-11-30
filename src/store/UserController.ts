@@ -3,6 +3,7 @@ import {
   type IUpdatePasswordRequest,
   type IUpdateProfileRequest,
 } from "../api/users-api";
+import { API_TEG_DATA } from "../constants/API_TEG_DATA";
 import type { IErrorResponse } from "../models/IErrorResponse";
 import store from "./Store";
 
@@ -14,13 +15,13 @@ export class UserController {
       .updateProfile(data)
       .then((res) => {
         if (res.success) {
-          store.set("authUserInfo", res.data);
+          store.set(API_TEG_DATA.AUTH_USER_INFO, res.data);
         } else {
-          store.set("error", res.error);
+          store.set(API_TEG_DATA.ERROR, res.error);
         }
       })
       .catch((e: IErrorResponse) => {
-        store.set("error", {
+        store.set(API_TEG_DATA.ERROR, {
           status: e.status || 0,
           message: e.message || "Не удалось обновить данные пользователя",
           details: JSON.stringify(e),
@@ -31,12 +32,14 @@ export class UserController {
     await api
       .updateAvatar(data)
       .then((res) => {
-        if (!res.success) {
-          store.set("error", res.error);
+        if (res.success && res.data) {
+          store.set(API_TEG_DATA.AUTH_USER_INFO, res.data);
+        } else {
+          store.set(API_TEG_DATA.ERROR, res.error);
         }
       })
       .catch((e: IErrorResponse) => {
-        store.set("error", {
+        store.set(API_TEG_DATA.ERROR, {
           status: e.status || 0,
           message: e.message || "Не удалось обновить данные пользователя",
           details: JSON.stringify(e),
@@ -48,11 +51,11 @@ export class UserController {
       .updatePassword(data)
       .then((res) => {
         if (!res.success) {
-          store.set("error", res.error);
+          store.set(API_TEG_DATA.ERROR, res.error);
         }
       })
       .catch((e: IErrorResponse) => {
-        store.set("error", {
+        store.set(API_TEG_DATA.ERROR, {
           status: e.status || 0,
           message: e.message || "Не удалось обновить данные пользователя",
           details: JSON.stringify(e),
@@ -65,15 +68,15 @@ export class UserController {
       .then((res) => {
         if (res.success) {
           if (res.data) {
-            store.set("userList", res.data);
-            store.set("error", null);
+            store.set(API_TEG_DATA.USER_LIST, res.data);
+            store.set(API_TEG_DATA.ERROR, null);
           } else {
-            store.set("error", res.error);
+            store.set(API_TEG_DATA.ERROR, res.error);
           }
         }
       })
       .catch((e: IErrorResponse) => {
-        store.set("error", {
+        store.set(API_TEG_DATA.ERROR, {
           status: e.status || 0,
           message: e.message || "Не удалось найти пользователя с таким login",
           details: JSON.stringify(e),

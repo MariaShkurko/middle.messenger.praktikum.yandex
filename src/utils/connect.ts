@@ -13,7 +13,7 @@ export function connect<TProps extends Props>(
     private state: Partial<TProps>;
 
     constructor(tagName: string = "div", props: TProps = {} as TProps) {
-      super(tagName, props);
+      super(tagName, { ...props, ...mapStateToProps(store.getState()) });
 
       this.state = mapStateToProps(store.getState());
 

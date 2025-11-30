@@ -10,6 +10,7 @@ import type { IWSMessage } from "../../models/IWebSocket";
 import { ChatController } from "../../store/ChatController";
 import store from "../../store/Store";
 import { connect } from "../../utils/connect";
+import { URL_RESOURCES } from "../../utils/HTTP";
 import isEqual from "../../utils/isEqual";
 import { validateInput } from "../../utils/validateForm";
 import AddUserForm from "./AddUserForm";
@@ -88,7 +89,7 @@ class Dialog extends Block<TDialogProps> {
     this.children.ContactAvatar = new Avatar({
       width: "34px",
       height: "34px",
-      avatarUrl: this.chatInfo?.avatar,
+      avatarUrl: this.chatInfo?.avatar ? `${URL_RESOURCES}${this.chatInfo.avatar}` : "",
     });
     this.children.MenuButton = new MenuButton({
       onClick: (_e: Event) => {

@@ -1,6 +1,7 @@
 import Block, { type Props } from "../../core/Block";
 import type { IChat, IMessage } from "../../models/IChat";
 import { connect } from "../../utils/connect";
+import { URL_RESOURCES } from "../../utils/HTTP";
 import { Avatar } from "../avatar";
 
 type TChatItemProps = Props &
@@ -79,7 +80,7 @@ class ChatItem extends Block<TChatItemProps> {
       lastMessageTime,
       ContactAvatar: new Avatar({
         className: "chat-item__avatar",
-        avatarUrl: props?.avatar,
+        avatarUrl: props?.avatar ? `${URL_RESOURCES}${props.avatar}` : "",
         width: "47px",
         height: "47px",
       }),

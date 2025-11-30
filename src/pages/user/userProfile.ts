@@ -12,6 +12,8 @@ import { connect } from "../../utils/connect";
 import { validateInput } from "../../utils/validateForm";
 import UserAvatarButton from "./userAvatarButton";
 import { UserAvatarForm } from "./UserAvatarForm";
+import isEqual from "../../utils/isEqual";
+import { URL_RESOURCES } from "../../utils/HTTP";
 
 type TUserProfileFormData = {
   email: string;
@@ -26,7 +28,7 @@ type TUserProfilePageProps = Props & {
   errors: TUserProfileFormData;
   userInfo: IUser;
   isEdit: boolean;
-  error: IErrorResponse;
+  error: IErrorResponse | null;
 };
 
 const router = Router.getInstance("#app");
@@ -45,12 +47,12 @@ class UserProfilePage extends Block<TUserProfilePageProps> {
 
   constructor(tagName: string = "div", props: TUserProfilePageProps = {} as TUserProfilePageProps) {
     const formState = {
-      email: "",
-      login: "",
-      first_name: "",
-      second_name: "",
-      display_name: "",
-      phone: "",
+      email: props.userInfo?.email ?? "",
+      login: props.userInfo?.login ?? "",
+      first_name: props.userInfo?.first_name ?? "",
+      second_name: props.userInfo?.second_name ?? "",
+      display_name: props.userInfo?.display_name ?? "",
+      phone: props.userInfo?.phone ?? "",
     };
     const errors = {
       email: "",
@@ -165,7 +167,7 @@ class UserProfilePage extends Block<TUserProfilePageProps> {
     const UserAvatar = new Avatar({
       width: "130px",
       height: "130px",
-      avatarUrl: "",
+      avatarUrl: props.userInfo?.avatar ? `${URL_RESOURCES}${props.userInfo.avatar}` : "",
     });
     const UserAvatarBtn = new UserAvatarButton(UserAvatar, (e) => {
       e.preventDefault();
@@ -285,8 +287,7 @@ class UserProfilePage extends Block<TUserProfilePageProps> {
           try {
             const form = document.getElementById("user-avatar-form") as HTMLFormElement;
             const formData = new FormData(form);
-            await controllerUser.updateAvatar(formData).then(async () => {
-              await controllerAuth.getAuthUserInfo();
+            await controllerUser.updateAvatar(formData).then(() => {
               if (!Array.isArray(this.children.ModalChangeAvatar)) {
                 this.children.ModalChangeAvatar.setProps({ active: false });
               }
@@ -308,6 +309,7 @@ class UserProfilePage extends Block<TUserProfilePageProps> {
       ...props,
       formState,
       errors,
+      error: null,
       isEdit,
       className: "user-profile",
       BackButton,
@@ -328,34 +330,44 @@ class UserProfilePage extends Block<TUserProfilePageProps> {
     });
   }
 
+  protected componentDidMount(_oldProps?: TUserProfilePageProps): void {
+    if (!_oldProps?.userInfo?.id) {
+      void controllerAuth.getAuthUserInfo();
+    }
+  }
+
   protected componentDidUpdate(
     _oldProps: TUserProfilePageProps,
     _newProps: TUserProfilePageProps,
   ): boolean {
-    Object.keys(_newProps.formState).forEach((key) => {
-      const keyProp = key as keyof TUserProfilePageProps["formState"];
-      if (_newProps.formState[keyProp] !== _oldProps.formState[keyProp]) {
-        const childrenName = UserProfilePage.FIELDS[key];
-        if (!Array.isArray(this.children[childrenName])) {
-          this.children[childrenName].setProps({
-            value: _newProps.formState[keyProp],
-          });
-          return true;
+    if (!isEqual(_newProps.formState, _oldProps.formState)) {
+      Object.keys(_newProps.formState).forEach((key) => {
+        const keyProp = key as keyof TUserProfilePageProps["formState"];
+        if (_newProps.formState[keyProp] !== _oldProps.formState[keyProp]) {
+          const childrenName = UserProfilePage.FIELDS[key];
+          if (!Array.isArray(this.children[childrenName])) {
+            this.children[childrenName].setProps({
+              value: _newProps.formState[keyProp],
+            });
+            return true;
+          }
         }
-      }
-    });
-    Object.keys(_newProps.errors).forEach((key) => {
-      const keyProp = key as keyof TUserProfilePageProps["errors"];
-      if (_newProps.errors[keyProp] !== _oldProps.errors[keyProp]) {
-        const childrenName = UserProfilePage.FIELDS[key];
-        if (!Array.isArray(this.children[childrenName])) {
-          this.children[childrenName].setProps({
-            errorMessage: _newProps.errors[keyProp],
-          });
-          return true;
+      });
+    }
+    if (!isEqual(_newProps.errors, _oldProps.errors)) {
+      Object.keys(_newProps.errors).forEach((key) => {
+        const keyProp = key as keyof TUserProfilePageProps["errors"];
+        if (_newProps.errors[keyProp] !== _oldProps.errors[keyProp]) {
+          const childrenName = UserProfilePage.FIELDS[key];
+          if (!Array.isArray(this.children[childrenName])) {
+            this.children[childrenName].setProps({
+              errorMessage: _newProps.errors[keyProp],
+            });
+            return true;
+          }
         }
-      }
-    });
+      });
+    }
 
     if (_oldProps.isEdit !== _newProps.isEdit) {
       Object.values(UserProfilePage.FIELDS).forEach((childrenName) => {
@@ -367,11 +379,38 @@ class UserProfilePage extends Block<TUserProfilePageProps> {
       });
       return true;
     }
-    if (_oldProps.userInfo !== _newProps.userInfo) {
-      this.setProps({ formState: _newProps.userInfo });
+    if (JSON.stringify(_oldProps.error) !== JSON.stringify(_newProps.error)) {
       return true;
     }
-    if (_oldProps.error !== _newProps.error) {
+
+    if (_oldProps.userInfo?.avatar !== _newProps.userInfo?.avatar) {
+      if (!Array.isArray(this.children.UserAvatar)) {
+        this.children.UserAvatar.setProps({
+          avatarUrl: _newProps.userInfo?.avatar
+            ? `${URL_RESOURCES}${_newProps.userInfo.avatar}`
+            : "",
+        });
+      }
+    }
+    const oldUserInfo = {
+      email: _oldProps.userInfo?.email,
+      login: _oldProps.userInfo?.login,
+      first_name: _oldProps.userInfo?.first_name,
+      second_name: _oldProps.userInfo?.second_name,
+      display_name: _oldProps.userInfo?.display_name,
+      phone: _oldProps.userInfo?.phone,
+    };
+
+    const newUserInfo = {
+      email: _newProps.userInfo?.email,
+      login: _newProps.userInfo?.login,
+      first_name: _newProps.userInfo?.first_name,
+      second_name: _newProps.userInfo?.second_name,
+      display_name: _newProps.userInfo?.display_name,
+      phone: _newProps.userInfo?.phone,
+    };
+    if (!isEqual(oldUserInfo, newUserInfo)) {
+      this.setProps({ formState: newUserInfo });
       return true;
     }
 
@@ -404,7 +443,6 @@ class UserProfilePage extends Block<TUserProfilePageProps> {
       <div class="user-profile__back-button">
         {{{ BackButton }}}
       </div>
-      <div>${errorMessage}</div>
       <div class="user-profile__main">
         <form id="user-profile-form">
 
@@ -439,6 +477,9 @@ class UserProfilePage extends Block<TUserProfilePageProps> {
               {{{ InputPhone }}}
             </div>
           </div>
+
+          <div>${errorMessage}</div>
+
           ${ControlsBlock}
         </form>
       </div>
