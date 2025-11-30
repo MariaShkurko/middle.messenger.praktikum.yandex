@@ -1,24 +1,27 @@
+import type { ISignUpRequest } from "../../api/auth-api";
 import { Button, Input } from "../../components";
 import { INPUT_NAME } from "../../constants/INPUT_NAME";
+import { ROUTES } from "../../constants/ROUTES";
 import Block, { type Props } from "../../core/Block";
-import { go } from "../../core/router";
+import Router from "../../core/router";
+import type { IErrorResponse } from "../../models/IErrorResponse";
+import { AuthController } from "../../store/AuthController";
+import { connect } from "../../utils/connect";
 import { validateInput } from "../../utils/validateForm";
 
-type TRegistrationFormData = {
-  email: string;
-  login: string;
-  first_name: string;
-  second_name: string;
-  phone: string;
-  password: string;
+type TRegistrationFormData = ISignUpRequest & {
   again_password: string;
 };
 type TRegistrationPageProps = Props & {
   formState: TRegistrationFormData;
   errors: TRegistrationFormData;
+  error: IErrorResponse;
 };
 
-export default class RegistrationPage extends Block<TRegistrationPageProps> {
+const router = Router.getInstance("#app");
+const controller = new AuthController();
+
+class RegistrationPage extends Block<TRegistrationPageProps> {
   static FIELDS = {
     [INPUT_NAME.EMAIL]: "InputEmail",
     [INPUT_NAME.LOGIN]: "InputLogin",
@@ -29,17 +32,20 @@ export default class RegistrationPage extends Block<TRegistrationPageProps> {
     [INPUT_NAME.AGAIN_PASSWORD]: "InputAgainPassword",
   };
 
-  constructor() {
-    const formState = {
-      email: "",
-      login: "",
+  constructor(
+    tagName: string = "div",
+    props: TRegistrationPageProps = {} as TRegistrationPageProps,
+  ) {
+    const formState: TRegistrationFormData = {
       first_name: "",
       second_name: "",
-      phone: "",
+      login: "",
+      email: "",
       password: "",
+      phone: "",
       again_password: "",
     };
-    const errors = {
+    const errors: TRegistrationFormData = {
       email: "",
       login: "",
       first_name: "",
@@ -206,28 +212,34 @@ export default class RegistrationPage extends Block<TRegistrationPageProps> {
       onClick: (e) => {
         e.preventDefault();
         if (allValidateInput()) {
-          // eslint-disable-next-line no-console
-          console.log(this.props.formState);
-          go("chats");
+          void (async () => {
+            try {
+              await controller.signUp(this.props.formState).then(() => {
+                window.location.href = ROUTES.MESSENGER;
+              });
+            } catch (error) {
+              console.error("Ошибка регистрации:", error);
+            }
+          })();
         }
       },
     });
     const SignInButton = new Button({
       label: "Войти",
       variant: "link",
-      page: "login",
       type: "button",
       onClick: (e) => {
         e.preventDefault();
-        // eslint-disable-next-line no-console
-        console.log("navigate to login");
+        router.go(ROUTES.SIGN_IN);
       },
     });
 
-    super("div", {
-      formState,
-      errors,
+    const combinedProps: TRegistrationPageProps = {
+      ...props,
+      formState: { ...formState, ...props?.formState },
+      errors: { ...errors, ...props?.errors },
       className: "login",
+      error: props?.error ?? null,
       InputEmail,
       InputLogin,
       InputFirstName,
@@ -237,7 +249,9 @@ export default class RegistrationPage extends Block<TRegistrationPageProps> {
       InputAgainPassword,
       SignUpButton,
       SignInButton,
-    });
+    };
+
+    super(tagName ?? "div", combinedProps);
   }
 
   protected componentDidUpdate(
@@ -293,3 +307,9 @@ export default class RegistrationPage extends Block<TRegistrationPageProps> {
     `;
   }
 }
+
+const ConnectedRegistrationPage = connect<TRegistrationPageProps>(RegistrationPage, (state) => ({
+  error: state.error as IErrorResponse,
+}));
+
+export default ConnectedRegistrationPage;

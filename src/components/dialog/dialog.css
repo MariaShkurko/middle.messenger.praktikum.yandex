@@ -33,15 +33,14 @@
   &__main {
     width: 100%;
     flex: 1;
-    height: calc(100vh - 108px);
-    overflow-y: auto;
+    max-height: calc(100vh - 117px);
+    overflow-y: scroll;
     border-top: 1px solid var(--border-color);
     border-bottom: 1px solid var(--border-color);
     padding: 30px 0;
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    justify-content: flex-end;
   }
 
   &__new-message {
@@ -57,5 +56,39 @@
   
   &__input {
     flex: 1;
+  }
+}
+
+.menu {
+  display: flex;
+  flex-direction: column;
+  position: absolute;
+  right: 10px;
+  top: 65px;
+  padding: 15px;
+  box-shadow: 0px 0px 20px 10px rgba(34, 60, 80, 0.26);
+  border-radius: 12px;
+  border: none;
+  background-color: var(--white-color);
+  gap: 16px;
+
+  &--hidden {
+    display: none;
+  }
+
+  &__item {
+    display: flex;
+    gap: 15px;
+  }
+
+  &__item-icon {
+    width: 22px;
+    height: 22px;
+  }
+
+  &__item-title {
+    color: var(--text-primary-color);
+    font-size: 14px;
+    line-height: 22px;
   }
 }
