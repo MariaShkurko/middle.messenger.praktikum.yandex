@@ -18,10 +18,10 @@ type TAddChatFormProps = Props & {
   onCloseModal: () => void;
 };
 
-const controllerChat = new ChatController();
-const controllerUser = new UserController();
-
 class AddChatForm extends Block<TAddChatFormProps> {
+  private readonly controllerChat = new ChatController();
+  private readonly controllerUser = new UserController();
+
   constructor(tagName: string = "form", props: TAddChatFormProps) {
     const chatTitle = "";
     const userLogin = "";
@@ -75,7 +75,7 @@ class AddChatForm extends Block<TAddChatFormProps> {
               if (this.props.selectedUser) {
                 users.push(this.props.selectedUser.id);
               }
-              await controllerChat
+              await this.controllerChat
                 .createChat({
                   title: this.props.chatTitle,
                   users,
@@ -83,7 +83,7 @@ class AddChatForm extends Block<TAddChatFormProps> {
                 .then(async () => {
                   this.props.onCloseModal();
                   this.setProps({ chatTitle: "", selectedUser: null });
-                  await controllerChat.getChats({});
+                  await this.controllerChat.getChats({});
                 });
             } catch (error) {
               console.error("Ошибка создания чата:", error);
@@ -107,7 +107,7 @@ class AddChatForm extends Block<TAddChatFormProps> {
 
   private async loadUsers() {
     try {
-      await controllerUser.searchUsers({ login: this.props.userLogin });
+      await this.controllerUser.searchUsers({ login: this.props.userLogin });
     } catch (error) {
       console.error("Ошибка загрузки пользователей:", error);
       store.set("error", { message: "Не удалось загрузить пользователей" });

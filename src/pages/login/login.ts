@@ -18,9 +18,10 @@ type TLoginPageProps = Props & {
 };
 
 const router = Router.getInstance("#app");
-const controller = new AuthController();
 
 class LoginPage extends Block<TLoginPageProps> {
+  private readonly controller = new AuthController();
+
   constructor(tagName: string = "div", props: TLoginPageProps = {} as TLoginPageProps) {
     const formState = {
       login: "",
@@ -107,7 +108,7 @@ class LoginPage extends Block<TLoginPageProps> {
         if (allValidateInput()) {
           void (async () => {
             try {
-              await controller.signIn(this.props.formState).then(() => {
+              await this.controller.signIn(this.props.formState).then(() => {
                 router.go(ROUTES.MESSENGER);
               });
             } catch (error) {

@@ -16,19 +16,19 @@ export interface IUpdatePasswordRequest {
   newPassword: string;
 }
 
-const APIInstance = new HTTP("/api/v2/user");
-
 export class UsersAPI extends BaseAPI {
+  private readonly APIInstance = new HTTP("/api/v2/user");
+
   updateProfile(data: IUpdateProfileRequest) {
-    return APIInstance.put<IUpdateProfileRequest, IUser>("/profile", { data });
+    return this.APIInstance.put<IUpdateProfileRequest, IUser>("/profile", { data });
   }
   updateAvatar(data: FormData) {
-    return APIInstance.put<FormData, void>("/profile/avatar", { data });
+    return this.APIInstance.put<FormData, void>("/profile/avatar", { data });
   }
   updatePassword(data: IUpdatePasswordRequest) {
-    return APIInstance.put<IUpdatePasswordRequest, void>("/password", { data });
+    return this.APIInstance.put<IUpdatePasswordRequest, void>("/password", { data });
   }
   searchUsers(data: { login: string }) {
-    return APIInstance.post<{ login: string }, IUser[]>("/search", { data });
+    return this.APIInstance.post<{ login: string }, IUser[]>("/search", { data });
   }
 }

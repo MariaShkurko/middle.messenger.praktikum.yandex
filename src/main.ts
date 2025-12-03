@@ -37,7 +37,10 @@ document.addEventListener("DOMContentLoaded", () => {
         initRouter();
       }
 
-      if (isAuthenticated() && window.location.pathname === ROUTES.SIGN_IN) {
+      if (
+        isAuthenticated() &&
+        (window.location.pathname === ROUTES.SIGN_IN || window.location.pathname === ROUTES.SIGN_UP)
+      ) {
         router.go(ROUTES.MESSENGER);
       } else if (!isAuthenticated() && window.location.pathname !== ROUTES.SIGN_IN) {
         router.go(ROUTES.SIGN_IN);

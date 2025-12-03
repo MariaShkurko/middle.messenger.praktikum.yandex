@@ -21,9 +21,9 @@ type TChatsPageProps = Props & {
 };
 
 const router = Router.getInstance("#app");
-const controller = new ChatController();
-
 class ChatsPage extends Block<TChatsPageProps> {
+  private readonly controller = new ChatController();
+
   constructor(tagName: string = "div", props: TChatsPageProps = {} as TChatsPageProps) {
     const searchValue = props.searchValue || "";
     const selectedChatId = props.selectedChatId || null;
@@ -152,7 +152,7 @@ class ChatsPage extends Block<TChatsPageProps> {
 
   private async loadChats() {
     try {
-      await controller.getChats({ title: this.props.searchValue });
+      await this.controller.getChats({ title: this.props.searchValue });
     } catch (error) {
       console.error("Ошибка загрузки чатов:", error);
       store.set("error", { message: "Не удалось загрузить чаты" });

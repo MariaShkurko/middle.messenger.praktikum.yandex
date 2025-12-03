@@ -30,9 +30,8 @@ type TDialogProps = Props & {
 
 const HOST_WS = "wss://ya-praktikum.tech";
 
-const controller = new ChatController();
-
 class Dialog extends Block<TDialogProps> {
+  private readonly controller = new ChatController();
   private ws: WebSocket | null = null;
   private pingInterval: number | null = null;
   private chatInfo: IChat | null = null;
@@ -164,7 +163,7 @@ class Dialog extends Block<TDialogProps> {
   private async getToken() {
     try {
       if (this.props.selectedChatId) {
-        await controller.getToken(this.props.selectedChatId);
+        await this.controller.getToken(this.props.selectedChatId);
       }
     } catch (error) {
       console.error("Ошибка подключения к чату:", error);
@@ -177,7 +176,7 @@ class Dialog extends Block<TDialogProps> {
       if (!this.props.selectedChatId) {
         throw Error("Не найден id чата");
       }
-      const unreadCount = await controller.getUnreadMessagesCount(this.props.selectedChatId);
+      const unreadCount = await this.controller.getUnreadMessagesCount(this.props.selectedChatId);
       let offset = 0;
       const messages: IWSMessage[] = [];
       if (unreadCount) {

@@ -15,19 +15,19 @@ export interface IAuthDataRequest {
   password: string;
 }
 
-const APIInstance = new HTTP("/api/v2/auth");
-
 export class AuthAPI extends BaseAPI {
+  private readonly APIInstance = new HTTP("/api/v2/auth");
+
   signUp(data: ISignUpRequest) {
-    return APIInstance.post<ISignUpRequest, { id: string }>("/signup", { data });
+    return this.APIInstance.post<ISignUpRequest, { id: string }>("/signup", { data });
   }
   signIn(data: IAuthDataRequest) {
-    return APIInstance.post<IAuthDataRequest>("/signin", { data });
+    return this.APIInstance.post<IAuthDataRequest>("/signin", { data });
   }
   logOut() {
-    return APIInstance.post("/logout");
+    return this.APIInstance.post("/logout");
   }
   getAuthUserInfo() {
-    return APIInstance.get<null, IUser>("/user");
+    return this.APIInstance.get<null, IUser>("/user");
   }
 }

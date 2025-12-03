@@ -24,9 +24,10 @@ type TEditPasswordPageProps = Props & {
 };
 
 const router = Router.getInstance("#app");
-const controllerUser = new UserController();
 
 class EditPasswordPage extends Block<TEditPasswordPageProps> {
+  private readonly controllerUser = new UserController();
+
   static FIELDS = {
     [INPUT_NAME.OLD_PASSWORD]: "InputOldPassword",
     [INPUT_NAME.NEW_PASSWORD]: "InputNewPassword",
@@ -100,7 +101,7 @@ class EditPasswordPage extends Block<TEditPasswordPageProps> {
         if (allValidateInput()) {
           void (async () => {
             try {
-              await controllerUser.updatePassword(this.props.formState).then(() => {
+              await this.controllerUser.updatePassword(this.props.formState).then(() => {
                 router.go(ROUTES.SETTINGS);
               });
             } catch (error) {
