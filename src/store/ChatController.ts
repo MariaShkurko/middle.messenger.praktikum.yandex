@@ -8,11 +8,11 @@ import { API_TEG_DATA } from "../constants/API_TEG_DATA";
 import type { IErrorResponse } from "../models/IErrorResponse";
 import store from "./Store";
 
-const api = new ChatAPI();
-
 export class ChatController {
+  private readonly api = new ChatAPI();
+
   public async getChats(data: IGetChatsRequest) {
-    await api
+    await this.api
       .getChats(data)
       .then((res) => {
         if (res.success) {
@@ -36,12 +36,12 @@ export class ChatController {
       });
   }
   public async createChat(data: { title: string; users: number[] }) {
-    await api
+    await this.api
       .createChat({ title: data.title })
       .then(async (res) => {
         if (res.success) {
           if (res.data?.id) {
-            await api.addUsers({ chatId: res.data.id, users: data.users });
+            await this.api.addUsers({ chatId: res.data.id, users: data.users });
           }
         } else {
           store.set(API_TEG_DATA.ERROR, res.error);
@@ -52,7 +52,7 @@ export class ChatController {
       });
   }
   public async addUsers(data: IAddUsersRequest) {
-    await api
+    await this.api
       .addUsers(data)
       .then((res) => {
         if (!res.success) {
@@ -67,7 +67,7 @@ export class ChatController {
       });
   }
   public async deleteUsers(data: IAddUsersRequest) {
-    await api
+    await this.api
       .deleteUsers(data)
       .then((res) => {
         if (!res.success) {
@@ -83,7 +83,7 @@ export class ChatController {
   }
   public async getToken(chatId: number) {
     store.set(API_TEG_DATA.CHAT_TOKEN, null);
-    await api
+    await this.api
       .getToken(chatId)
       .then((res) => {
         if (res.success && res.data) {
@@ -98,7 +98,7 @@ export class ChatController {
   }
   public async getUnreadMessagesCount(chatId: number) {
     try {
-      const res = await api.getUnreadMessagesCount(chatId);
+      const res = await this.api.getUnreadMessagesCount(chatId);
 
       if (res.success && res.data) {
         return res.data.unread_count;
@@ -119,7 +119,7 @@ export class ChatController {
   }
   public async getUsersInChat(data: IGetUsersInChatRequest) {
     try {
-      const res = await api.getUsersInChat(data);
+      const res = await this.api.getUsersInChat(data);
 
       if (res.success && res.data?.length) {
         store.set(API_TEG_DATA.CHAT_USER_LIST, res.data);

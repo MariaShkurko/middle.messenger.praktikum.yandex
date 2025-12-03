@@ -32,10 +32,11 @@ type TUserProfilePageProps = Props & {
 };
 
 const router = Router.getInstance("#app");
-const controllerAuth = new AuthController();
-const controllerUser = new UserController();
 
 class UserProfilePage extends Block<TUserProfilePageProps> {
+  private readonly controllerAuth = new AuthController();
+  private readonly controllerUser = new UserController();
+
   static FIELDS = {
     [INPUT_NAME.EMAIL]: "InputEmail",
     [INPUT_NAME.LOGIN]: "InputLogin",
@@ -136,7 +137,7 @@ class UserProfilePage extends Block<TUserProfilePageProps> {
         e.preventDefault();
         void (async () => {
           try {
-            await controllerAuth.logOut().then(() => {
+            await this.controllerAuth.logOut().then(() => {
               router.go(ROUTES.SIGN_IN);
             });
           } catch (error) {
@@ -154,7 +155,7 @@ class UserProfilePage extends Block<TUserProfilePageProps> {
         if (allValidateInput()) {
           void (async () => {
             try {
-              await controllerUser.updateProfile(this.props.formState).then(() => {
+              await this.controllerUser.updateProfile(this.props.formState).then(() => {
                 onChangeIsEdit(false);
               });
             } catch (error) {
@@ -287,7 +288,7 @@ class UserProfilePage extends Block<TUserProfilePageProps> {
           try {
             const form = document.getElementById("user-avatar-form") as HTMLFormElement;
             const formData = new FormData(form);
-            await controllerUser.updateAvatar(formData).then(() => {
+            await this.controllerUser.updateAvatar(formData).then(() => {
               if (!Array.isArray(this.children.ModalChangeAvatar)) {
                 this.children.ModalChangeAvatar.setProps({ active: false });
               }
@@ -332,7 +333,7 @@ class UserProfilePage extends Block<TUserProfilePageProps> {
 
   protected componentDidMount(_oldProps?: TUserProfilePageProps): void {
     if (!_oldProps?.userInfo?.id) {
-      void controllerAuth.getAuthUserInfo();
+      void this.controllerAuth.getAuthUserInfo();
     }
   }
 

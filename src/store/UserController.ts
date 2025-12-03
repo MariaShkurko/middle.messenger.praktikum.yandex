@@ -7,11 +7,10 @@ import { API_TEG_DATA } from "../constants/API_TEG_DATA";
 import type { IErrorResponse } from "../models/IErrorResponse";
 import store from "./Store";
 
-const api = new UsersAPI();
-
 export class UserController {
+  private readonly api = new UsersAPI();
   public async updateProfile(data: IUpdateProfileRequest) {
-    await api
+    await this.api
       .updateProfile(data)
       .then((res) => {
         if (res.success) {
@@ -29,7 +28,7 @@ export class UserController {
       });
   }
   public async updateAvatar(data: FormData) {
-    await api
+    await this.api
       .updateAvatar(data)
       .then((res) => {
         if (res.success && res.data) {
@@ -47,7 +46,7 @@ export class UserController {
       });
   }
   public async updatePassword(data: IUpdatePasswordRequest) {
-    await api
+    await this.api
       .updatePassword(data)
       .then((res) => {
         if (!res.success) {
@@ -63,7 +62,7 @@ export class UserController {
       });
   }
   public async searchUsers(data: { login: string }) {
-    await api
+    await this.api
       .searchUsers(data)
       .then((res) => {
         if (res.success) {

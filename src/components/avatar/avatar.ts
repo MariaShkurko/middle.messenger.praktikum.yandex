@@ -19,7 +19,7 @@ export default class Avatar extends Block<TAvatarProps> {
   render() {
     if (this.props.avatarUrl) {
       return `
-        <img src={{avatarUrl}} alt="avatar" />
+        <img src="{{avatarUrl}}" alt="avatar" />
       `;
     }
     return "";

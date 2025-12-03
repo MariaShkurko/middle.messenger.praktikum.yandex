@@ -3,12 +3,12 @@ import { API_TEG_DATA } from "../constants/API_TEG_DATA";
 import type { IErrorResponse } from "../models/IErrorResponse";
 import store from "./Store";
 
-const api = new AuthAPI();
-
 export class AuthController {
+  private readonly api = new AuthAPI();
+
   public async signUp(data: ISignUpRequest) {
     try {
-      await api.signUp(data).then((res) => {
+      await this.api.signUp(data).then((res) => {
         if (res.success) {
           store.set(API_TEG_DATA.ERROR, null);
         } else {
@@ -24,7 +24,7 @@ export class AuthController {
     }
   }
   public async signIn(data: IAuthDataRequest) {
-    await api.signIn(data).then((res) => {
+    await this.api.signIn(data).then((res) => {
       if (res.success) {
         store.set(API_TEG_DATA.ERROR, null);
         store.set(API_TEG_DATA.AUTH_STATUS, true);
@@ -34,7 +34,7 @@ export class AuthController {
     });
   }
   public async logOut() {
-    await api
+    await this.api
       .logOut()
       .then((res) => {
         if (!res.success) {
@@ -52,7 +52,7 @@ export class AuthController {
       );
   }
   public async getAuthUserInfo() {
-    await api
+    await this.api
       .getAuthUserInfo()
       .then((res) => {
         if (res.success) {

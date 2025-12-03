@@ -19,9 +19,10 @@ type TRegistrationPageProps = Props & {
 };
 
 const router = Router.getInstance("#app");
-const controller = new AuthController();
 
 class RegistrationPage extends Block<TRegistrationPageProps> {
+  private readonly controller = new AuthController();
+
   static FIELDS = {
     [INPUT_NAME.EMAIL]: "InputEmail",
     [INPUT_NAME.LOGIN]: "InputLogin",
@@ -214,7 +215,7 @@ class RegistrationPage extends Block<TRegistrationPageProps> {
         if (allValidateInput()) {
           void (async () => {
             try {
-              await controller.signUp(this.props.formState).then(() => {
+              await this.controller.signUp(this.props.formState).then(() => {
                 window.location.href = ROUTES.MESSENGER;
               });
             } catch (error) {

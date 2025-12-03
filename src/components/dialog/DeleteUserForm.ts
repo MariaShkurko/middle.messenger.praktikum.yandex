@@ -17,9 +17,9 @@ type TDeleteUserFormProps = Props & {
   onCloseModal: () => void;
 };
 
-const controller = new ChatController();
-
 class DeleteUserForm extends Block<TDeleteUserFormProps> {
+  private readonly controller = new ChatController();
+
   constructor(tagName: string = "form", props: TDeleteUserFormProps) {
     const UserListComponent = new ChatUserList("div", {
       userList: null,
@@ -47,7 +47,7 @@ class DeleteUserForm extends Block<TDeleteUserFormProps> {
               if (this.props.selectedUser) {
                 users.push(this.props.selectedUser.id);
               }
-              await controller
+              await this.controller
                 .deleteUsers({
                   chatId: this.props.selectedChatId as number,
                   users,
@@ -55,8 +55,8 @@ class DeleteUserForm extends Block<TDeleteUserFormProps> {
                 .then(async () => {
                   this.props.onCloseModal();
                   this.setProps({ selectedUser: null });
-                  await controller.getChats({});
-                  await controller.getUsersInChat({
+                  await this.controller.getChats({});
+                  await this.controller.getUsersInChat({
                     chatId: this.props.selectedChatId as number,
                   });
                 });
@@ -79,7 +79,7 @@ class DeleteUserForm extends Block<TDeleteUserFormProps> {
   private async loadUsers() {
     try {
       if (this.props.selectedChatId) {
-        await controller.getUsersInChat({ chatId: this.props.selectedChatId });
+        await this.controller.getUsersInChat({ chatId: this.props.selectedChatId });
       } else {
         throw Error("Не найден id текущего чата");
       }
