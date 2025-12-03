@@ -1,0 +1,138 @@
+import {
+  ChatAPI,
+  type IAddUsersRequest,
+  type IGetChatsRequest,
+  type IGetUsersInChatRequest,
+} from "../api/chat-api";
+import { API_TEG_DATA } from "../constants/API_TEG_DATA";
+import type { IErrorResponse } from "../models/IErrorResponse";
+import store from "./Store";
+
+export class ChatController {
+  private readonly api = new ChatAPI();
+
+  public async getChats(data: IGetChatsRequest) {
+    await this.api
+      .getChats(data)
+      .then((res) => {
+        if (res.success) {
+          if (res.data) {
+            store.set(API_TEG_DATA.CHAT_LIST, res.data);
+          }
+        } else {
+          if (res.error?.status === 401) {
+            throw new Error(res.error?.message || "Неавторизованный пользователь");
+          } else {
+            throw new Error(res.error?.message || "Не удалось получить чаты");
+          }
+        }
+      })
+      .catch((e: IErrorResponse) => {
+        store.set(API_TEG_DATA.ERROR, {
+          status: e.status || 0,
+          message: e.message || "Не удалось получить чаты",
+          details: JSON.stringify(e),
+        });
+      });
+  }
+  public async createChat(data: { title: string; users: number[] }) {
+    await this.api
+      .createChat({ title: data.title })
+      .then(async (res) => {
+        if (res.success) {
+          if (res.data?.id) {
+            await this.api.addUsers({ chatId: res.data.id, users: data.users });
+          }
+        } else {
+          store.set(API_TEG_DATA.ERROR, res.error);
+        }
+      })
+      .catch((e: IErrorResponse) => {
+        store.set(API_TEG_DATA.ERROR, `Не удалось создать чат: ${JSON.stringify(e)}`);
+      });
+  }
+  public async addUsers(data: IAddUsersRequest) {
+    await this.api
+      .addUsers(data)
+      .then((res) => {
+        if (!res.success) {
+          store.set(API_TEG_DATA.ERROR, res.error);
+        }
+      })
+      .catch((e: IErrorResponse) => {
+        store.set(
+          API_TEG_DATA.ERROR,
+          `Не удалось добавить пользователя в чат: ${JSON.stringify(e)}`,
+        );
+      });
+  }
+  public async deleteUsers(data: IAddUsersRequest) {
+    await this.api
+      .deleteUsers(data)
+      .then((res) => {
+        if (!res.success) {
+          store.set(API_TEG_DATA.ERROR, res.error);
+        }
+      })
+      .catch((e: IErrorResponse) => {
+        store.set(
+          API_TEG_DATA.ERROR,
+          `Не удалось удалить пользователя из чата: ${JSON.stringify(e)}`,
+        );
+      });
+  }
+  public async getToken(chatId: number) {
+    store.set(API_TEG_DATA.CHAT_TOKEN, null);
+    await this.api
+      .getToken(chatId)
+      .then((res) => {
+        if (res.success && res.data) {
+          store.set(API_TEG_DATA.CHAT_TOKEN, res.data.token);
+        } else {
+          store.set(API_TEG_DATA.ERROR, res.error ?? "Не удалось подключиться к чату");
+        }
+      })
+      .catch((e: IErrorResponse) => {
+        store.set(API_TEG_DATA.ERROR, `Не удалось подключиться к чату: ${JSON.stringify(e)}`);
+      });
+  }
+  public async getUnreadMessagesCount(chatId: number) {
+    try {
+      const res = await this.api.getUnreadMessagesCount(chatId);
+
+      if (res.success && res.data) {
+        return res.data.unread_count;
+      } else {
+        store.set(
+          API_TEG_DATA.ERROR,
+          res.error ?? "Не удалось получить количество непрочитанных сообщений",
+        );
+        return null;
+      }
+    } catch (error) {
+      store.set(
+        "error",
+        `Ошибка при получении количества непрочитанных сообщений: ${JSON.stringify(error)}`,
+      );
+      return null;
+    }
+  }
+  public async getUsersInChat(data: IGetUsersInChatRequest) {
+    try {
+      const res = await this.api.getUsersInChat(data);
+
+      if (res.success && res.data?.length) {
+        store.set(API_TEG_DATA.CHAT_USER_LIST, res.data);
+      } else {
+        store.set(API_TEG_DATA.ERROR, res.error ?? "Не удалось получить список пользователей чата");
+        return null;
+      }
+    } catch (error) {
+      store.set(
+        API_TEG_DATA.ERROR,
+        `Ошибка при получении списка пользователей чата: ${JSON.stringify(error)}`,
+      );
+      return null;
+    }
+  }
+}

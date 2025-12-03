@@ -3,7 +3,6 @@ import Block, { type Props } from "../../core/Block";
 type TButtonProps = Props & {
   variant?: "primary" | "link" | "icon";
   type?: "submit" | "reset" | "button";
-  page?: string;
   icon?: string; // svg иконка в raw представлении
   label?: string;
   onClick: (e: Event) => void;
@@ -22,7 +21,6 @@ export default class Button extends Block<TButtonProps> {
   constructor(props: TButtonProps) {
     const { type = "button" } = props;
     const attrs: Record<string, string> = { type };
-    if (props.page) attrs["data-page"] = props.page;
     super("button", {
       ...props,
       className: getClassName(props),

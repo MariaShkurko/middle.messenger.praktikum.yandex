@@ -1,26 +1,42 @@
-import { Avatar, Button, Input, Modal } from "../../components";
-import Block, { type Props } from "../../core/Block";
 import arrowIcon from "../../assets/arrow-icon.svg?raw";
-import { validateInput } from "../../utils/validateForm";
+import { Avatar, Button, Input, Modal } from "../../components";
 import { INPUT_NAME } from "../../constants/INPUT_NAME";
-import { userMockData } from "../../mockData";
+import { ROUTES } from "../../constants/ROUTES";
+import Block, { type Props } from "../../core/Block";
+import Router from "../../core/router";
+import type { IErrorResponse } from "../../models/IErrorResponse";
+import type { IUser } from "../../models/IUser";
+import { AuthController } from "../../store/AuthController";
+import { UserController } from "../../store/UserController";
+import { connect } from "../../utils/connect";
+import { validateInput } from "../../utils/validateForm";
 import UserAvatarButton from "./userAvatarButton";
+import { UserAvatarForm } from "./UserAvatarForm";
+import isEqual from "../../utils/isEqual";
+import { URL_RESOURCES } from "../../utils/HTTP";
 
 type TUserProfileFormData = {
   email: string;
   login: string;
-  firstName: string;
-  secondName: string;
-  displayName: string;
+  first_name: string;
+  second_name: string;
+  display_name: string;
   phone: string;
 };
 type TUserProfilePageProps = Props & {
   formState: TUserProfileFormData;
   errors: TUserProfileFormData;
+  userInfo: IUser;
   isEdit: boolean;
+  error: IErrorResponse | null;
 };
 
-export default class UserProfilePage extends Block<TUserProfilePageProps> {
+const router = Router.getInstance("#app");
+
+class UserProfilePage extends Block<TUserProfilePageProps> {
+  private readonly controllerAuth = new AuthController();
+  private readonly controllerUser = new UserController();
+
   static FIELDS = {
     [INPUT_NAME.EMAIL]: "InputEmail",
     [INPUT_NAME.LOGIN]: "InputLogin",
@@ -30,21 +46,21 @@ export default class UserProfilePage extends Block<TUserProfilePageProps> {
     [INPUT_NAME.PHONE]: "InputPhone",
   };
 
-  constructor() {
+  constructor(tagName: string = "div", props: TUserProfilePageProps = {} as TUserProfilePageProps) {
     const formState = {
-      email: userMockData.email,
-      login: userMockData.login,
-      firstName: userMockData.first_name,
-      secondName: userMockData.second_name,
-      displayName: userMockData.display_name,
-      phone: userMockData.phone,
+      email: props.userInfo?.email ?? "",
+      login: props.userInfo?.login ?? "",
+      first_name: props.userInfo?.first_name ?? "",
+      second_name: props.userInfo?.second_name ?? "",
+      display_name: props.userInfo?.display_name ?? "",
+      phone: props.userInfo?.phone ?? "",
     };
     const errors = {
       email: "",
       login: "",
-      firstName: "",
-      secondName: "",
-      displayName: "",
+      first_name: "",
+      second_name: "",
+      display_name: "",
       phone: "",
     };
     const isEdit = false;
@@ -89,12 +105,10 @@ export default class UserProfilePage extends Block<TUserProfilePageProps> {
 
     const BackButton = new Button({
       variant: "icon",
-      page: "chats",
       icon: arrowIcon,
       onClick: (e: Event) => {
         e.preventDefault();
-        // eslint-disable-next-line no-console
-        console.log("navigate to chats");
+        router.go(ROUTES.MESSENGER);
       },
     });
     const EditProfileButton = new Button({
@@ -109,23 +123,27 @@ export default class UserProfilePage extends Block<TUserProfilePageProps> {
     const EditPasswordButton = new Button({
       label: "Изменить пароль",
       variant: "link",
-      page: "edit-password",
       type: "button",
       onClick: (e) => {
         e.preventDefault();
-        // eslint-disable-next-line no-console
-        console.log("navigate to edit password");
+        router.go(ROUTES.EDIT_PASSWORD);
       },
     });
     const ExitButton = new Button({
       label: "Выйти",
       variant: "link",
-      page: "login",
       type: "button",
       onClick: (e) => {
         e.preventDefault();
-        // eslint-disable-next-line no-console
-        console.log("navigate to login");
+        void (async () => {
+          try {
+            await this.controllerAuth.logOut().then(() => {
+              router.go(ROUTES.SIGN_IN);
+            });
+          } catch (error) {
+            console.error("Ошибка выхода:", error);
+          }
+        })();
       },
     });
     const SubmitButton = new Button({
@@ -135,16 +153,22 @@ export default class UserProfilePage extends Block<TUserProfilePageProps> {
       onClick: (e) => {
         e.preventDefault();
         if (allValidateInput()) {
-          // eslint-disable-next-line no-console
-          console.log(this.props.formState);
-          onChangeIsEdit(false);
+          void (async () => {
+            try {
+              await this.controllerUser.updateProfile(this.props.formState).then(() => {
+                onChangeIsEdit(false);
+              });
+            } catch (error) {
+              console.error("Ошибка сохранения:", error);
+            }
+          })();
         }
       },
     });
     const UserAvatar = new Avatar({
       width: "130px",
       height: "130px",
-      avatarUrl: userMockData.avatarUrl,
+      avatarUrl: props.userInfo?.avatar ? `${URL_RESOURCES}${props.userInfo.avatar}` : "",
     });
     const UserAvatarBtn = new UserAvatarButton(UserAvatar, (e) => {
       e.preventDefault();
@@ -191,8 +215,8 @@ export default class UserProfilePage extends Block<TUserProfilePageProps> {
       formId: "user-profile-form",
       type: "text",
       variant: "line",
-      value: formState.firstName,
-      errorMessage: errors.firstName,
+      value: formState.first_name,
+      errorMessage: errors.first_name,
       disabled: !isEdit,
       onChange: (e) => {
         const target = e.target as HTMLInputElement;
@@ -208,8 +232,8 @@ export default class UserProfilePage extends Block<TUserProfilePageProps> {
       formId: "user-profile-form",
       type: "text",
       variant: "line",
-      value: formState.secondName,
-      errorMessage: errors.secondName,
+      value: formState.second_name,
+      errorMessage: errors.second_name,
       disabled: !isEdit,
       onChange: (e) => {
         const target = e.target as HTMLInputElement;
@@ -225,8 +249,8 @@ export default class UserProfilePage extends Block<TUserProfilePageProps> {
       formId: "user-profile-form",
       type: "text",
       variant: "line",
-      value: formState.displayName,
-      errorMessage: errors.displayName,
+      value: formState.display_name,
+      errorMessage: errors.display_name,
       disabled: !isEdit,
       onChange: (e) => {
         const target = e.target as HTMLInputElement;
@@ -260,36 +284,34 @@ export default class UserProfilePage extends Block<TUserProfilePageProps> {
       className: "avatar-modal__submit",
       onClick: (e) => {
         e.preventDefault();
-        const form = document.getElementById("user-avatar-form") as HTMLFormElement;
-        const formData = new FormData(form);
-        // eslint-disable-next-line no-console
-        console.log("upload avatar", formData.get("avatar"));
-        if (!Array.isArray(this.children.ModalChangeAvatar)) {
-          this.children.ModalChangeAvatar.setProps({ active: false });
-        }
+        void (async () => {
+          try {
+            const form = document.getElementById("user-avatar-form") as HTMLFormElement;
+            const formData = new FormData(form);
+            await this.controllerUser.updateAvatar(formData).then(() => {
+              if (!Array.isArray(this.children.ModalChangeAvatar)) {
+                this.children.ModalChangeAvatar.setProps({ active: false });
+              }
+            });
+          } catch (error) {
+            console.error("Ошибка сохранения:", error);
+          }
+        })();
       },
     });
+    const UserAvatarFormComponent = new UserAvatarForm({ SubmitAvatarButton });
     const ModalChangeAvatar = new Modal({
       id: "change-avatar-modal",
       active: false,
-      children: `
-        <form id="user-avatar-form">
-          <p class="modal__title">Загрузите файл</p>
-          <label class="avatar-modal__file-label">
-            <input type="file" name="avatar" accept="image/*" class="avatar-modal__file-input" />
-            <span class="avatar-modal__file-text">Выбрать файл на компьютере</span>
-          </label>
-          {{{ SubmitAvatarButton }}}
-        </form>
-      `,
-      SubmitAvatarButton,
+      content: UserAvatarFormComponent,
     });
 
-    super("div", {
+    super(tagName ?? "div", {
+      ...props,
       formState,
       errors,
+      error: null,
       isEdit,
-      user: userMockData,
       className: "user-profile",
       BackButton,
       UserAvatar,
@@ -309,34 +331,44 @@ export default class UserProfilePage extends Block<TUserProfilePageProps> {
     });
   }
 
+  protected componentDidMount(_oldProps?: TUserProfilePageProps): void {
+    if (!_oldProps?.userInfo?.id) {
+      void this.controllerAuth.getAuthUserInfo();
+    }
+  }
+
   protected componentDidUpdate(
     _oldProps: TUserProfilePageProps,
     _newProps: TUserProfilePageProps,
   ): boolean {
-    Object.keys(_newProps.formState).forEach((key) => {
-      const keyProp = key as keyof TUserProfilePageProps["formState"];
-      if (_newProps.formState[keyProp] !== _oldProps.formState[keyProp]) {
-        const childrenName = UserProfilePage.FIELDS[key];
-        if (!Array.isArray(this.children[childrenName])) {
-          this.children[childrenName].setProps({
-            value: _newProps.formState[keyProp],
-          });
-          return true;
+    if (!isEqual(_newProps.formState, _oldProps.formState)) {
+      Object.keys(_newProps.formState).forEach((key) => {
+        const keyProp = key as keyof TUserProfilePageProps["formState"];
+        if (_newProps.formState[keyProp] !== _oldProps.formState[keyProp]) {
+          const childrenName = UserProfilePage.FIELDS[key];
+          if (!Array.isArray(this.children[childrenName])) {
+            this.children[childrenName].setProps({
+              value: _newProps.formState[keyProp],
+            });
+            return true;
+          }
         }
-      }
-    });
-    Object.keys(_newProps.errors).forEach((key) => {
-      const keyProp = key as keyof TUserProfilePageProps["errors"];
-      if (_newProps.errors[keyProp] !== _oldProps.errors[keyProp]) {
-        const childrenName = UserProfilePage.FIELDS[key];
-        if (!Array.isArray(this.children[childrenName])) {
-          this.children[childrenName].setProps({
-            errorMessage: _newProps.errors[keyProp],
-          });
-          return true;
+      });
+    }
+    if (!isEqual(_newProps.errors, _oldProps.errors)) {
+      Object.keys(_newProps.errors).forEach((key) => {
+        const keyProp = key as keyof TUserProfilePageProps["errors"];
+        if (_newProps.errors[keyProp] !== _oldProps.errors[keyProp]) {
+          const childrenName = UserProfilePage.FIELDS[key];
+          if (!Array.isArray(this.children[childrenName])) {
+            this.children[childrenName].setProps({
+              errorMessage: _newProps.errors[keyProp],
+            });
+            return true;
+          }
         }
-      }
-    });
+      });
+    }
 
     if (_oldProps.isEdit !== _newProps.isEdit) {
       Object.values(UserProfilePage.FIELDS).forEach((childrenName) => {
@@ -348,11 +380,46 @@ export default class UserProfilePage extends Block<TUserProfilePageProps> {
       });
       return true;
     }
+    if (JSON.stringify(_oldProps.error) !== JSON.stringify(_newProps.error)) {
+      return true;
+    }
+
+    if (_oldProps.userInfo?.avatar !== _newProps.userInfo?.avatar) {
+      if (!Array.isArray(this.children.UserAvatar)) {
+        this.children.UserAvatar.setProps({
+          avatarUrl: _newProps.userInfo?.avatar
+            ? `${URL_RESOURCES}${_newProps.userInfo.avatar}`
+            : "",
+        });
+      }
+    }
+    const oldUserInfo = {
+      email: _oldProps.userInfo?.email,
+      login: _oldProps.userInfo?.login,
+      first_name: _oldProps.userInfo?.first_name,
+      second_name: _oldProps.userInfo?.second_name,
+      display_name: _oldProps.userInfo?.display_name,
+      phone: _oldProps.userInfo?.phone,
+    };
+
+    const newUserInfo = {
+      email: _newProps.userInfo?.email,
+      login: _newProps.userInfo?.login,
+      first_name: _newProps.userInfo?.first_name,
+      second_name: _newProps.userInfo?.second_name,
+      display_name: _newProps.userInfo?.display_name,
+      phone: _newProps.userInfo?.phone,
+    };
+    if (!isEqual(oldUserInfo, newUserInfo)) {
+      this.setProps({ formState: newUserInfo });
+      return true;
+    }
 
     return false;
   }
 
   render() {
+    const errorMessage = this.props.error ? JSON.stringify(this.props.error) : "";
     const ControlsBlock = this.props.isEdit
       ? `
         <div class="user-profile__controls user-profile__controls--edit">
@@ -411,6 +478,9 @@ export default class UserProfilePage extends Block<TUserProfilePageProps> {
               {{{ InputPhone }}}
             </div>
           </div>
+
+          <div>${errorMessage}</div>
+
           ${ControlsBlock}
         </form>
       </div>
@@ -419,3 +489,10 @@ export default class UserProfilePage extends Block<TUserProfilePageProps> {
     `;
   }
 }
+
+const ConnectedUserProfilePage = connect<TUserProfilePageProps>(UserProfilePage, (state) => ({
+  error: state.error as IErrorResponse,
+  userInfo: state.authUserInfo as IUser,
+}));
+
+export default ConnectedUserProfilePage;

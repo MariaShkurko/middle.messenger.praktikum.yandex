@@ -35,6 +35,13 @@
     flex: 1;
   }
 
+  &__list--empty {
+    margin: 20px 0;
+    color: var(--text-secondary-color);
+    font-size: 12px;
+    text-align: center;
+  }
+
   &__main {
     flex: 1;
     height: 100vh;

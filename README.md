@@ -26,15 +26,15 @@ Figma: https://www.figma.com/design/nyCcHdBKIdxAuihydRQjl2/middle.messenger.prak
 
 ## Ссылки на сверстанные страницы
 
-| Страница             | Путь                                             |
-| -------------------- | ------------------------------------------------ |
-| Авторизация          | https://vite-messenger.netlify.app/login         |
-| Регистрация          | https://vite-messenger.netlify.app/registration  |
-| Список чатов + чат   | https://vite-messenger.netlify.app/chats         |
-| Профиль пользователя | https://vite-messenger.netlify.app/user-profile  |
-| Смена пароля         | https://vite-messenger.netlify.app/edit-password |
-| Ошибка 404           | https://vite-messenger.netlify.app/404.html      |
-| Ошибка 500           | https://vite-messenger.netlify.app/500.html      |
+| Страница             | Путь                                                      |
+| -------------------- | --------------------------------------------------------- |
+| Авторизация          | https://vite-messenger.netlify.app/                       |
+| Регистрация          | https://vite-messenger.netlify.app/sign-up                |
+| Список чатов + чат   | https://vite-messenger.netlify.app/messenger              |
+| Профиль пользователя | https://vite-messenger.netlify.app/settings               |
+| Смена пароля         | https://vite-messenger.netlify.app/settings/edit-password |
+| Ошибка 404           | https://vite-messenger.netlify.app/404.html               |
+| Ошибка 500           | https://vite-messenger.netlify.app/500.html               |
 
 ---
 
