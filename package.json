@@ -33,6 +33,12 @@
       "prettier --write"
     ]
   },
+  "husky": {
+    "hooks": {
+      "pre-commit": "npx lint-staged",
+      "pre-push": "npm run build"
+    }
+  },
   "devDependencies": {
     "@types/chai": "5.2.3",
     "@types/handlebars": "^4.1.0",
