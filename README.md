@@ -5,6 +5,7 @@
 - [sprint_1](https://github.com/MariaShkurko/middle.messenger.praktikum.yandex/pull/3)
 - [sprint_2](https://github.com/MariaShkurko/middle.messenger.praktikum.yandex/pull/5)
 - [sprint_3](https://github.com/MariaShkurko/middle.messenger.praktikum.yandex/pull/10)
+- [sprint_4](https://github.com/MariaShkurko/middle.messenger.praktikum.yandex/pull/12)
 
 ---
 
@@ -57,6 +58,7 @@ npm install
 ### Валидация проекта
 
 - `npm run lint` - запуск проверки типов TS, линтеров ESLint и StyleLint
+- `npm run test` - запуск тестов
 
 ---
 
@@ -70,6 +72,7 @@ npm install
   - `postcss-preset-env`
   - `stylelint`
 - **Vite** — сборка и dev-сервер
+- **Mocha**, **Chai**, **Sinon** - тестирование
 
 ---
 
@@ -82,3 +85,4 @@ npm install
 - Компоненты реализуются в формате: `index.ts` + `Component.ts` + `Component.css`
 - Используется БЭМ-нейминг в стилях
 - Настроен pre-commit и pre-push с помощью Husky
+- Написаны unit-тесты для элементов ядра
