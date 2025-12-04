@@ -17,7 +17,9 @@
     "lint": "npm run type-check && npm run lint:css && npm run lint:code",
     "format": "prettier --write .",
     "test": "TS_NODE_PROJECT=./tsconfig.test.json node --loader ts-node/esm --experimental-loader ./test-resolver.mjs --no-warnings node_modules/mocha/bin/mocha",
-    "prepare": "husky"
+    "prepare": "husky",
+    "pre-commit": "npx lint-staged",
+    "pre-push": "npm run build"
   },
   "lint-staged": {
     "*.ts": [
