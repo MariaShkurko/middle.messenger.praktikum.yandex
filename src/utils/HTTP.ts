@@ -85,11 +85,11 @@ class HTTP {
 
       const xhr = new XMLHttpRequest();
       const isGet = method === METHODS.GET;
-      let baseUrl = `${HOST}${this.baseUrl}${url}`;
-      if (typeof data === "object" && data !== null && !Array.isArray(data)) {
-        baseUrl += queryStringify(data as Record<string, unknown>);
+      let requestUrl = `${HOST}${this.baseUrl}${url}`;
+      if (isGet && typeof data === "object" && data !== null && !Array.isArray(data)) {
+        requestUrl += queryStringify(data as Record<string, unknown>);
       }
-      xhr.open(method, baseUrl);
+      xhr.open(method, requestUrl);
 
       xhr.withCredentials = true;
       xhr.timeout = timeout;
