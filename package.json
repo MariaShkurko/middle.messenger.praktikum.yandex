@@ -16,13 +16,13 @@
     "lint:code": "eslint . --ext .ts --config .eslintrc.cjs",
     "lint": "npm run type-check && npm run lint:css && npm run lint:code",
     "format": "prettier --write .",
-    "prepare": "husky"
+    "prepare": "husky",
+    "test": "TS_NODE_PROJECT=./tsconfig.test.json node --loader ts-node/esm --experimental-loader ./test-resolver.mjs --no-warnings node_modules/mocha/bin/mocha"
   },
   "lint-staged": {
     "*.ts": [
       "eslint --fix",
-      "prettier --write",
-      "tsc --noEmit --pretty"
+      "prettier --write"
     ],
     "*.css": [
       "stylelint --fix",
@@ -33,9 +33,14 @@
     ]
   },
   "devDependencies": {
+    "@types/chai": "5.2.3",
+    "@types/handlebars": "^4.1.0",
+    "@types/mocha": "10.0.10",
+    "@types/sinon": "21.0.0",
     "@typescript-eslint/eslint-plugin": "8.33.1",
     "@typescript-eslint/parser": "8.33.1",
     "autoprefixer": "10.4.21",
+    "chai": "6.2.1",
     "eslint": "8.57.1",
     "eslint-config-airbnb": "19.0.4",
     "eslint-config-airbnb-base": "15.0.0",
@@ -44,15 +49,20 @@
     "eslint-plugin-import": "2.32.0",
     "eslint-plugin-prettier": "5.4.1",
     "husky": "9.1.7",
+    "import-meta-resolve": "4.2.0",
+    "jsdom": "27.2.0",
     "lint-staged": "16.1.5",
+    "mocha": "11.7.5",
     "postcss": "8.5.3",
     "postcss-nested": "7.0.2",
     "postcss-preset-env": "10.1.6",
     "prettier": "3.5.3",
-    "stylelint": "^16.23.1",
+    "sinon": "21.0.0",
+    "stylelint": "16.23.1",
     "stylelint-config-standard": "39.0.0",
+    "ts-node": "10.9.2",
     "typescript": "5.8.3",
-    "vite": "6.3.5"
+    "vite": "6.4.1"
   },
   "dependencies": {
     "handlebars": "4.7.8",

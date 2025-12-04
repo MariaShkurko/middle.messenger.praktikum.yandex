@@ -86,7 +86,7 @@ export class ChatController {
     await this.api
       .getToken(chatId)
       .then((res) => {
-        if (res.success && res.data) {
+        if (res.success && typeof res.data !== "undefined") {
           store.set(API_TEG_DATA.CHAT_TOKEN, res.data.token);
         } else {
           store.set(API_TEG_DATA.ERROR, res.error ?? "Не удалось подключиться к чату");
@@ -100,7 +100,7 @@ export class ChatController {
     try {
       const res = await this.api.getUnreadMessagesCount(chatId);
 
-      if (res.success && res.data) {
+      if (res.success && typeof res.data !== "undefined") {
         return res.data.unread_count;
       } else {
         store.set(

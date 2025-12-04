@@ -4,6 +4,7 @@
 
 - [sprint_1](https://github.com/MariaShkurko/middle.messenger.praktikum.yandex/pull/3)
 - [sprint_2](https://github.com/MariaShkurko/middle.messenger.praktikum.yandex/pull/5)
+- [sprint_3](https://github.com/MariaShkurko/middle.messenger.praktikum.yandex/pull/10)
 
 ---
 

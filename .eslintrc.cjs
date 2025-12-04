@@ -43,4 +43,25 @@ module.exports = {
     },
   },
   ignorePatterns: ['vite.config.js', 'postcss.config.js', '*.cjs'],
+  overrides: [
+    {
+      "files": ["*.spec.ts"],
+      "rules": {
+        "@typescript-eslint/no-unused-expressions": "off",
+        "@typescript-eslint/no-empty-function": "off",
+        "@typescript-eslint/no-explicit-any": "off",
+        "@typescript-eslint/ban-ts-comment": "off",
+        "@typescript-eslint/naming-convention": "off",
+        "@typescript-eslint/no-unsafe-assignment": "off",
+        "@typescript-eslint/no-unsafe-call": "off",
+        "max-nested-callbacks": "off",
+        "max-statements": "off",
+        "complexity": "off",
+        "no-magic-numbers": "off",
+        "prefer-arrow/prefer-arrow-functions": "off",
+        "import/no-extraneous-dependencies": "off",
+      }
+    }
+  ]
+
 };

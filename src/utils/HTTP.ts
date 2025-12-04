@@ -41,6 +41,19 @@ function queryStringify(data: Record<string, unknown>): string {
     : "";
 }
 
+export class HTTPError extends Error {
+  public status: number;
+  public message: string;
+  public details: string;
+  constructor(status: number, message: string, details: string) {
+    super(message);
+    this.status = status;
+    this.message = message;
+    this.details = details;
+    this.name = "HTTPError";
+  }
+}
+
 class HTTP {
   private baseUrl: string;
 
@@ -72,15 +85,22 @@ class HTTP {
 
       const xhr = new XMLHttpRequest();
       const isGet = method === METHODS.GET;
-      xhr.open(
-        method,
-        isGet && !!data
-          ? `${HOST}${this.baseUrl}${url}${queryStringify(data)}`
-          : `${HOST}${this.baseUrl}${url}`,
-      );
+      let baseUrl = `${HOST}${this.baseUrl}${url}`;
+      if (typeof data === "object" && data !== null && !Array.isArray(data)) {
+        baseUrl += queryStringify(data as Record<string, unknown>);
+      }
+      xhr.open(method, baseUrl);
 
       xhr.withCredentials = true;
       xhr.timeout = timeout;
+
+      xhr.onerror = () => {
+        reject(new HTTPError(500, "Network Error", "Не удалось установить соединение с сервером"));
+      };
+
+      xhr.ontimeout = () => {
+        reject(new HTTPError(504, "Request timed out", `Запрос занял больше ${timeout} мс`));
+      };
 
       let contentType: string | null = null;
 
@@ -128,27 +148,6 @@ class HTTP {
             },
           });
         }
-      };
-      xhr.onerror = () => {
-        resolve({
-          success: false,
-          error: {
-            status: 500,
-            message: "Network Error",
-            details: "Не удалось установить соединение с сервером",
-          },
-        });
-      };
-
-      xhr.ontimeout = () => {
-        resolve({
-          success: false,
-          error: {
-            status: 504,
-            message: "Request timed out",
-            details: `Запрос занял больше ${timeout} мс`,
-          },
-        });
       };
 
       if (isGet || !data) {
