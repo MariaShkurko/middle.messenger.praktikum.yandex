@@ -26,31 +26,31 @@ interface Meta<T = Props> {
 }
 
 abstract class Block<TProps extends Props = Props> {
-  #element: HTMLElement | null = null;
+  private _element: HTMLElement | null = null;
 
-  #meta: Meta<TProps>;
+  private _meta: Meta<TProps>;
 
-  #id: string = makeUUID();
+  private _id: string = makeUUID();
 
-  #eventBus: EventBus<IAppEvents<TProps>>;
+  private _eventBus: EventBus<IAppEvents<TProps>>;
 
   protected children: Children;
 
   public props: TProps;
 
   constructor(tagName = "div", propsAndChildren = {} as TProps) {
-    const { children, props } = this.#getChildrenAndProps(propsAndChildren);
+    const { children, props } = this._getChildrenAndProps(propsAndChildren);
     this.children = children;
-    this.#meta = { tagName, props };
+    this._meta = { tagName, props };
 
-    this.#eventBus = new EventBus<IAppEvents<TProps>>();
-    this.props = this.#makePropsProxy(props);
-    this.#registerEvents(this.#eventBus);
-    this.#eventBus.emit(BLOCK_EVENTS.INIT);
+    this._eventBus = new EventBus<IAppEvents<TProps>>();
+    this.props = this._makePropsProxy(props);
+    this._registerEvents(this._eventBus);
+    this._eventBus.emit(BLOCK_EVENTS.INIT);
   }
 
-  #makePropsProxy(props: TProps): TProps {
-    const emit = this.#eventBus.emit.bind(this.#eventBus);
+  _makePropsProxy(props: TProps): TProps {
+    const emit = this._eventBus.emit.bind(this._eventBus);
 
     return new Proxy<TProps>(props, {
       get(target, prop, receiver): unknown {
@@ -86,26 +86,26 @@ abstract class Block<TProps extends Props = Props> {
     return document.createElement(tagName);
   }
 
-  #registerEvents(eventBus: EventBus<IAppEvents<TProps>>): void {
+  _registerEvents(eventBus: EventBus<IAppEvents<TProps>>): void {
     eventBus.on(BLOCK_EVENTS.INIT, this.init.bind(this));
-    eventBus.on(BLOCK_EVENTS.FLOW_CDM, this.#componentDidMount.bind(this));
-    eventBus.on(BLOCK_EVENTS.FLOW_CDU, this.#componentDidUpdate.bind(this));
-    eventBus.on(BLOCK_EVENTS.FLOW_RENDER, this.#render.bind(this));
+    eventBus.on(BLOCK_EVENTS.FLOW_CDM, this._componentDidMount.bind(this));
+    eventBus.on(BLOCK_EVENTS.FLOW_CDU, this._componentDidUpdate.bind(this));
+    eventBus.on(BLOCK_EVENTS.FLOW_RENDER, this._render.bind(this));
   }
 
-  #createResources(): void {
-    const { tagName, props } = this.#meta;
-    this.#element = Block.createDocumentElement(tagName);
+  _createResources(): void {
+    const { tagName, props } = this._meta;
+    this._element = Block.createDocumentElement(tagName);
 
     if (typeof props.className === "string") {
       const classes = props.className.split(" ");
-      this.#element?.classList.add(...classes);
+      this._element?.classList.add(...classes);
     }
 
     if (typeof props.attrs === "object") {
       Object.entries(props.attrs).forEach(([attrName, attrValue]) => {
         if (typeof attrValue === "string") {
-          this.#element?.setAttribute(attrName, attrValue);
+          this._element?.setAttribute(attrName, attrValue);
         }
       });
     }
@@ -115,31 +115,31 @@ abstract class Block<TProps extends Props = Props> {
       for (const [key, value] of Object.entries(style)) {
         if (typeof value === "string") {
           if (key.startsWith("--")) {
-            this.#element.style.setProperty(key, value);
-          } else if (key in this.#element.style) {
+            this._element.style.setProperty(key, value);
+          } else if (key in this._element.style) {
             const kebabKey = key.replace(/[A-Z]/g, (match) => `-${match.toLowerCase()}`);
-            this.#element.style.setProperty(kebabKey, value);
+            this._element.style.setProperty(kebabKey, value);
           }
         }
       }
     }
   }
 
-  #addEvents(): void {
+  _addEvents(): void {
     const { events = {} } = this.props;
     Object.keys(events).forEach((eventName) => {
-      this.#element?.addEventListener(eventName, events[eventName]);
+      this._element?.addEventListener(eventName, events[eventName]);
     });
   }
 
-  #removeEvents(): void {
+  _removeEvents(): void {
     const { events = {} } = this.props;
     Object.keys(events).forEach((eventName) => {
-      this.#element?.removeEventListener(eventName, events[eventName]);
+      this._element?.removeEventListener(eventName, events[eventName]);
     });
   }
 
-  #getChildrenAndProps(propsAndChildren: TProps): { children: Children; props: TProps } {
+  _getChildrenAndProps(propsAndChildren: TProps): { children: Children; props: TProps } {
     const children: Children = {};
     const props: Partial<TProps> = {};
     Object.entries(propsAndChildren).forEach(([key, value]) => {
@@ -154,28 +154,28 @@ abstract class Block<TProps extends Props = Props> {
     return { children, props: props as TProps };
   }
 
-  #componentDidMount(): void {
+  _componentDidMount(): void {
     this.componentDidMount(this.props);
-    this.#eventBus.emit(BLOCK_EVENTS.FLOW_RENDER);
+    this._eventBus.emit(BLOCK_EVENTS.FLOW_RENDER);
   }
 
-  #componentDidUpdate(oldProps: TProps, newProps: TProps): void {
+  _componentDidUpdate(oldProps: TProps, newProps: TProps): void {
     const shouldUpdate = this.componentDidUpdate(oldProps, newProps);
     if (shouldUpdate) {
-      this.#eventBus.emit(BLOCK_EVENTS.FLOW_RENDER);
+      this._eventBus.emit(BLOCK_EVENTS.FLOW_RENDER);
     }
   }
 
-  #compile(): DocumentFragment {
+  _compile(): DocumentFragment {
     const propsAndStubs = { ...this.props };
     Object.entries(this.children).forEach(([key, child]) => {
       if (Array.isArray(child)) {
         propsAndStubs[key as keyof TProps] = child.map(
-          (component) => `<div data-id="${component.#id}"></div>`,
+          (component) => `<div data-id="${component._id}"></div>`,
         ) as TProps[keyof TProps];
       } else {
         propsAndStubs[key as keyof TProps] =
-          `<div data-id="${child.#id}"></div>` as TProps[keyof TProps];
+          `<div data-id="${child._id}"></div>` as TProps[keyof TProps];
       }
     });
 
@@ -186,11 +186,11 @@ abstract class Block<TProps extends Props = Props> {
     Object.values(this.children).forEach((child) => {
       if (Array.isArray(child)) {
         child.forEach((component) => {
-          const stub = fragment.content.querySelector(`[data-id="${component.#id}"]`);
+          const stub = fragment.content.querySelector(`[data-id="${component._id}"]`);
           stub?.replaceWith(component.getContent() as Node);
         });
       } else {
-        const stub = fragment.content.querySelector(`[data-id="${child.#id}"]`);
+        const stub = fragment.content.querySelector(`[data-id="${child._id}"]`);
         stub?.replaceWith(child.getContent() as Node);
       }
     });
@@ -198,22 +198,22 @@ abstract class Block<TProps extends Props = Props> {
     return fragment.content;
   }
 
-  #render(): void {
-    this.#removeEvents();
-    const block = this.#compile();
+  _render(): void {
+    this._removeEvents();
+    const block = this._compile();
 
-    if (this.#element?.children.length === 0) {
-      this.#element.appendChild(block);
+    if (this._element?.children.length === 0) {
+      this._element.appendChild(block);
     } else {
-      this.#element?.replaceChildren(block);
+      this._element?.replaceChildren(block);
     }
 
-    this.#addEvents();
+    this._addEvents();
   }
 
   protected init(): void {
-    this.#createResources();
-    this.#eventBus.emit(BLOCK_EVENTS.FLOW_CDM);
+    this._createResources();
+    this._eventBus.emit(BLOCK_EVENTS.FLOW_CDM);
   }
 
   protected componentDidMount(_oldProps?: TProps): void {}
@@ -227,38 +227,46 @@ abstract class Block<TProps extends Props = Props> {
   }
 
   public addClassName(className: string) {
-    this.#element?.classList.add(className);
+    this._element?.classList.add(className);
   }
 
   public removeClassName(className: string) {
-    this.#element?.classList.remove(className);
+    this._element?.classList.remove(className);
   }
 
   public dispatchComponentDidMount(): void {
-    this.#eventBus.emit(BLOCK_EVENTS.FLOW_CDM);
+    this._eventBus.emit(BLOCK_EVENTS.FLOW_CDM);
   }
 
   public dispatchComponentDidUpdate(): void {
-    this.#eventBus.emit(BLOCK_EVENTS.FLOW_CDU);
+    this._eventBus.emit(BLOCK_EVENTS.FLOW_CDU);
   }
 
   public setProps(nextProps: Partial<TProps>): void {
     if (!nextProps) return;
     const oldProps = JSON.parse(JSON.stringify(this.props)) as TProps;
     Object.assign(this.props, nextProps);
-    this.#eventBus.emit(BLOCK_EVENTS.FLOW_CDU, oldProps, this.props);
+    this._eventBus.emit(BLOCK_EVENTS.FLOW_CDU, oldProps, this.props);
   }
 
   public get element(): HTMLElement | null {
-    return this.#element;
+    return this._element;
   }
 
   public getContent(): HTMLElement | null {
-    return this.#element;
+    return this._element;
   }
 
   public addChild(name: string, child: Block<Props> | Block<Props>[]) {
     this.children[name] = child;
+  }
+
+  public getChildren(): Children {
+    return this.children;
+  }
+
+  public getEventBus(): EventBus<IAppEvents<TProps>> {
+    return this._eventBus;
   }
 }
 

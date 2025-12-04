@@ -4,7 +4,7 @@ export const validateInput = (inputName: TInputName, value: string): string => {
   switch (inputName) {
     case INPUT_NAME.FIRST_NAME:
     case INPUT_NAME.SECOND_NAME: {
-      const regex = /^[А-ЯЁA-Z][а-яёa-z-]*$/u;
+      const regex = /^[А-ЯЁA-Z][а-яёa-z-]*$/;
       if (!regex.test(value)) {
         return "Разрешенный формат - первая буква заглавная, только буквы и дефис, без пробелов и цифр";
       }

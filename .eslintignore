@@ -1,8 +1,10 @@
 node_modules/
 dist/
 public/
-*.hbs
 **/*.min.js
+*.spec.ts
+mochaSetup.js
+test-resolver.mjs
 
 .vscode/*
 *.DS_Store

@@ -1,0 +1,10 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "allowJs": true,
+    "resolveJsonModule": true,
+    "esModuleInterop": false
+  },
+  "include": ["src/**/*", "**/*.spec.ts"],
+  "exclude": ["node_modules", "dist"]
+}

@@ -31,7 +31,7 @@ export class UserController {
     await this.api
       .updateAvatar(data)
       .then((res) => {
-        if (res.success && res.data) {
+        if (res.success && typeof res.data !== "undefined") {
           store.set(API_TEG_DATA.AUTH_USER_INFO, res.data);
         } else {
           store.set(API_TEG_DATA.ERROR, res.error);

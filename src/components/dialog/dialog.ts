@@ -33,7 +33,7 @@ const HOST_WS = "wss://ya-praktikum.tech";
 class Dialog extends Block<TDialogProps> {
   private readonly controller = new ChatController();
   private ws: WebSocket | null = null;
-  private pingInterval: number | null = null;
+  private pingInterval: ReturnType<typeof setTimeout> | null = null;
   private chatInfo: IChat | null = null;
 
   constructor(tagName: string = "div", props: TDialogProps) {
