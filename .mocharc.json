@@ -1,0 +1,6 @@
+{
+  "extension": ["ts"],
+  "spec": "src/**/*.spec.ts",
+  "watch-files": ["src/**/*.ts"],
+  "require": ["ts-node/register", "./mochaSetup.js"]
+}
